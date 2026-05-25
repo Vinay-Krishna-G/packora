@@ -1,4 +1,5 @@
 import { ScannedFile } from "./fileTypes";
+import { shouldIgnore } from "../filters/shouldIgnore";
 
 export async function scanFiles(
     files: File[]
@@ -6,6 +7,9 @@ export async function scanFiles(
     const scannedFiles: ScannedFile[] = [];
 
     for (const file of files) {
+        if (shouldIgnore(file.webkitRelativePath || file.name)) {
+            continue;
+        }
         const content = await file.text();
 
         scannedFiles.push({
