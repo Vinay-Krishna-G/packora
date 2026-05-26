@@ -1,10 +1,10 @@
 export const DEFAULT_IGNORES = [
-    "node_modules/**",
-    ".git/**",
-    ".next/**",
-    "dist/**",
-    "build/**",
-    "coverage/**",
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
 
     ".env",
     ".env.*",

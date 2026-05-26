@@ -5,3 +5,9 @@ export type ScannedFile = {
     size: number;
     content: string;
 };
+
+export type ScanResult = {
+    scannedFiles: ScannedFile[];
+    ignoredCount: number;
+    totalFiles: number;
+};

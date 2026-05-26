@@ -1,55 +1,179 @@
 "use client";
 
 import { useState } from "react";
+
 import { scanFiles } from "@/lib/scanner/scanFiles";
-import { ScannedFile } from "@/lib/scanner/fileTypes";
-
 import { generateMarkdown } from "@/lib/formatter/generateMarkdown";
-
 import { downloadFile } from "@/lib/exporter/downloadFile";
 
+import { ScannedFile } from "@/lib/scanner/fileTypes";
+
 export default function UploadZone() {
+
+    const [ignoredCount, setIgnoredCount] =
+        useState(0);
+
+    const [totalFiles, setTotalFiles] =
+        useState(0);
+
+    const [processingTime, setProcessingTime] =
+        useState(0);
+
+    const [markdownContent, setMarkdownContent] =
+        useState("");
     const [files, setFiles] = useState<ScannedFile[]>([]);
 
-    async function handleFolderUpload(
-        event: React.ChangeEvent<HTMLInputElement>
+    async function handleFilesUploaded(
+        uploadedFiles: File[]
     ) {
-        const uploadedFiles = Array.from(event.target.files || []);
+        const start = performance.now();
 
-        const scanned = await scanFiles(uploadedFiles);
+        const result = await scanFiles(uploadedFiles);
 
-        const markdown = generateMarkdown(scanned);
+        setFiles(result.scannedFiles);
 
-        downloadFile(markdown, "packora-context.md");
+        setIgnoredCount(result.ignoredCount);
 
-        setFiles(scanned);
+        setTotalFiles(result.totalFiles);
+
+        const markdown = generateMarkdown(
+            result.scannedFiles
+        );
+
+        setMarkdownContent(markdown);
+
+        // downloadFile(markdown, "packora-context.md");
+
+        const end = performance.now();
+
+        setProcessingTime(
+            Number(((end - start) / 1000).toFixed(2))
+        );
     }
 
     return (
-        <div className="p-8">
-            <input
-                type="file"
-                multiple
-                webkitdirectory="true"
-                onChange={handleFolderUpload}
-            />
+        <main className="min-h-screen bg-black text-white p-8">
+            <div className="mx-auto max-w-4xl">
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold">
+                        Packora
+                    </h1>
 
-            <div className="mt-6">
-                <h2 className="text-xl font-bold">
-                    Scanned Files: {files.length}
-                </h2>
+                    <p className="mt-2 text-zinc-400">
+                        AI-ready project context generation.
+                    </p>
+                </div>
 
-                <ul className="mt-4 space-y-2">
-                    {files.map((file) => (
-                        <li
-                            key={file.path}
-                            className="rounded border p-2"
-                        >
-                            {file.path}
-                        </li>
-                    ))}
-                </ul>
+                <label
+                    className="
+    mt-6 flex cursor-pointer flex-col items-center
+    justify-center rounded-2xl border-2 border-dashed
+    border-zinc-700 bg-zinc-900 p-16 text-center
+    transition hover:border-zinc-500
+  "
+                >
+                    <input
+                        type="file"
+                        multiple
+                        webkitdirectory="true"
+                        className="hidden"
+                        onChange={(event) => {
+                            const uploadedFiles = Array.from(
+                                event.target.files || []
+                            );
+
+                            handleFilesUploaded(uploadedFiles);
+                        }}
+                    />
+
+                    <p className="text-xl font-semibold">
+                        Drag & drop or click to upload
+                    </p>
+
+                    <p className="mt-2 text-sm text-zinc-400">
+                        Upload your entire project folder
+                    </p>
+                </label>
+
+                <div className="mt-8 text-sm text-zinc-500">
+                    Files never leave your device.
+                </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-4">
+                    <div className="rounded-xl border border-zinc-800 p-4">
+                        <div className="text-sm text-zinc-400">
+                            Total Files
+                        </div>
+
+                        <div className="mt-2 text-2xl font-bold">
+                            {totalFiles}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 p-4">
+                        <div className="text-sm text-zinc-400">
+                            Included
+                        </div>
+
+                        <div className="mt-2 text-2xl font-bold">
+                            {files.length}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 p-4">
+                        <div className="text-sm text-zinc-400">
+                            Ignored
+                        </div>
+
+                        <div className="mt-2 text-2xl font-bold">
+                            {ignoredCount}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 p-4">
+                        <div className="text-sm text-zinc-400">
+                            Processing Time
+                        </div>
+
+                        <div className="mt-2 text-2xl font-bold">
+                            {processingTime}s
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-8">
+                    <h2 className="text-xl font-semibold">
+                        Included Files ({files.length})
+                    </h2>
+
+                    <div className="mt-4 max-h-[400px] overflow-auto rounded-xl border border-zinc-800">
+                        {files.map((file) => (
+                            <div
+                                key={file.path}
+                                className="border-b border-zinc-800 px-4 py-2 text-sm"
+                            >
+                                {file.path}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
-        </div>
+            <button
+                onClick={() =>
+                    downloadFile(
+                        markdownContent,
+                        "packora-context.md"
+                    )
+                }
+                disabled={!markdownContent}
+                className="
+    mt-8 rounded-xl bg-white px-6 py-3
+    font-semibold text-black transition
+    hover:bg-zinc-200 disabled:opacity-50
+  "
+            >
+                Export Markdown
+            </button>
+        </main>
     );
 }
