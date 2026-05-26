@@ -4,6 +4,7 @@ export type ScannedFile = {
     extension: string;
     size: number;
     content: string;
+    included: boolean;
 };
 
 export type ScanResult = {

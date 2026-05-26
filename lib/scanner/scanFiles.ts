@@ -31,6 +31,8 @@ export async function scanFiles(
                 file.name.split(".").pop() || "",
             size: file.size,
             content,
+            included: true,
+
         });
     }
 

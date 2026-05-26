@@ -8,6 +8,12 @@ import { downloadFile } from "@/lib/exporter/downloadFile";
 
 import { ScannedFile } from "@/lib/scanner/fileTypes";
 
+import { estimateTokens }
+    from "@/lib/tokenizer/estimateTokens";
+
+import FileList
+    from "./preview/FileList";
+
 export default function UploadZone() {
 
     const [ignoredCount, setIgnoredCount] =
@@ -21,7 +27,24 @@ export default function UploadZone() {
 
     const [markdownContent, setMarkdownContent] =
         useState("");
+
     const [files, setFiles] = useState<ScannedFile[]>([]);
+
+    const [estimatedTokens, setEstimatedTokens] =
+        useState(0);
+
+    function toggleFile(path: string) {
+        setFiles((previousFiles) =>
+            previousFiles.map((file) =>
+                file.path === path
+                    ? {
+                        ...file,
+                        included: !file.included,
+                    }
+                    : file
+            )
+        );
+    }
 
     async function handleFilesUploaded(
         uploadedFiles: File[]
@@ -41,6 +64,10 @@ export default function UploadZone() {
         );
 
         setMarkdownContent(markdown);
+
+        setEstimatedTokens(
+            estimateTokens(markdown)
+        );
 
         // downloadFile(markdown, "packora-context.md");
 
@@ -132,6 +159,16 @@ export default function UploadZone() {
 
                     <div className="rounded-xl border border-zinc-800 p-4">
                         <div className="text-sm text-zinc-400">
+                            Estimated Tokens
+                        </div>
+
+                        <div className="mt-2 text-2xl font-bold">
+                            {estimatedTokens.toLocaleString()}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 p-4">
+                        <div className="text-sm text-zinc-400">
                             Processing Time
                         </div>
 
@@ -146,17 +183,10 @@ export default function UploadZone() {
                         Included Files ({files.length})
                     </h2>
 
-                    <div className="mt-4 max-h-[400px] overflow-auto rounded-xl border border-zinc-800">
-                        {files.map((file) => (
-                            <div
-                                key={file.path}
-                                className="border-b border-zinc-800 px-4 py-2 text-sm"
-                            >
-                                {file.path}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                    <FileList
+                        files={files}
+                        onToggle={toggleFile}
+                    />                </div>
             </div>
             <button
                 onClick={() =>

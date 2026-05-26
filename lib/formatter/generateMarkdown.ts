@@ -4,7 +4,10 @@ export function generateMarkdown(
     files: ScannedFile[]
 ): string {
     let markdown = "# Packora Project Context\n\n";
-    const prioritizedFiles = sortFiles(files);
+    const includedFiles = files.filter(
+        (file) => file.included
+    );
+    const prioritizedFiles = sortFiles(includedFiles)
 
     for (const file of prioritizedFiles) {
         markdown += `## ${file.path}\n\n`;
