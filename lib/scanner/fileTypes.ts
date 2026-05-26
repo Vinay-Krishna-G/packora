@@ -1,3 +1,5 @@
+export type FileType = "text" | "binary" | "oversized";
+
 export type ScannedFile = {
     name: string;
     path: string;
@@ -5,6 +7,7 @@ export type ScannedFile = {
     size: number;
     content: string;
     included: boolean;
+    type: FileType;
 };
 
 export type ScanResult = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { scanFiles } from "@/lib/scanner/scanFiles";
 import { generateMarkdown } from "@/lib/formatter/generateMarkdown";
@@ -16,22 +16,26 @@ import FileList
 
 export default function UploadZone() {
 
-    const [ignoredCount, setIgnoredCount] =
-        useState(0);
-
-    const [totalFiles, setTotalFiles] =
-        useState(0);
-
-    const [processingTime, setProcessingTime] =
-        useState(0);
-
-    const [markdownContent, setMarkdownContent] =
-        useState("");
-
+    const [ignoredCount, setIgnoredCount] = useState(0);
+    const [totalFiles, setTotalFiles] = useState(0);
+    const [processingTime, setProcessingTime] = useState(0);
     const [files, setFiles] = useState<ScannedFile[]>([]);
+    const [exportFormat, setExportFormat] = useState<"markdown" | "xml">("markdown");
 
-    const [estimatedTokens, setEstimatedTokens] =
-        useState(0);
+    // Dynamically derive generated content based on file array and export format
+    const exportContent = useMemo(() => {
+        return generateMarkdown(files, exportFormat);
+    }, [files, exportFormat]);
+
+    // Dynamically derive estimated tokens based on the exported content
+    const estimatedTokens = useMemo(() => {
+        return estimateTokens(exportContent);
+    }, [exportContent]);
+
+    // Dynamically derive how many files are currently included
+    const includedCount = useMemo(() => {
+        return files.filter((f) => f.included).length;
+    }, [files]);
 
     function toggleFile(path: string) {
         setFiles((previousFiles) =>
@@ -54,22 +58,8 @@ export default function UploadZone() {
         const result = await scanFiles(uploadedFiles);
 
         setFiles(result.scannedFiles);
-
         setIgnoredCount(result.ignoredCount);
-
         setTotalFiles(result.totalFiles);
-
-        const markdown = generateMarkdown(
-            result.scannedFiles
-        );
-
-        setMarkdownContent(markdown);
-
-        setEstimatedTokens(
-            estimateTokens(markdown)
-        );
-
-        // downloadFile(markdown, "packora-context.md");
 
         const end = performance.now();
 
@@ -143,7 +133,7 @@ export default function UploadZone() {
                         </div>
 
                         <div className="mt-2 text-2xl font-bold">
-                            {files.length}
+                            {includedCount}
                         </div>
                     </div>
 
@@ -180,30 +170,63 @@ export default function UploadZone() {
 
                 <div className="mt-8">
                     <h2 className="text-xl font-semibold">
-                        Included Files ({files.length})
+                        Included Files ({includedCount})
                     </h2>
 
                     <FileList
                         files={files}
                         onToggle={toggleFile}
-                    />                </div>
+                    />
+                </div>
             </div>
-            <button
-                onClick={() =>
-                    downloadFile(
-                        markdownContent,
-                        "packora-context.md"
-                    )
-                }
-                disabled={!markdownContent}
-                className="
-    mt-8 rounded-xl bg-white px-6 py-3
-    font-semibold text-black transition
-    hover:bg-zinc-200 disabled:opacity-50
-  "
-            >
-                Export Markdown
-            </button>
+
+            <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                <button
+                    onClick={() =>
+                        downloadFile(
+                            exportContent,
+                            exportFormat === "markdown" ? "packora-context.md" : "packora-context.xml"
+                        )
+                    }
+                    disabled={!exportContent || files.length === 0}
+                    className="
+                        rounded-xl bg-white px-6 py-3.5
+                        font-semibold text-black transition
+                        hover:bg-zinc-200 disabled:opacity-50 disabled:hover:bg-white
+                    "
+                >
+                    Export {exportFormat === "markdown" ? "Markdown" : "XML"}
+                </button>
+
+                <div className="flex bg-zinc-900 border border-zinc-800 p-1 rounded-xl">
+                    <button
+                        type="button"
+                        onClick={() => setExportFormat("markdown")}
+                        className={`
+                            rounded-lg px-4 py-2 text-xs font-semibold transition
+                            ${exportFormat === "markdown"
+                                ? "bg-zinc-800 text-white"
+                                : "text-zinc-400 hover:text-zinc-200"
+                            }
+                        `}
+                    >
+                        Markdown (+XML Tags)
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setExportFormat("xml")}
+                        className={`
+                            rounded-lg px-4 py-2 text-xs font-semibold transition
+                            ${exportFormat === "xml"
+                                ? "bg-zinc-800 text-white"
+                                : "text-zinc-400 hover:text-zinc-200"
+                            }
+                        `}
+                    >
+                        Pure XML
+                    </button>
+                </div>
+            </div>
         </main>
     );
 }
