@@ -27,4 +27,10 @@ export const DEFAULT_IGNORES = [
 
     ".DS_Store",
     "Thumbs.db",
+
+    // Lockfiles & build info (AI-irrelevant noise excluded by default)
+    "**/package-lock.json",
+    "**/yarn.lock",
+    "**/pnpm-lock.yaml",
+    "**/*.tsbuildinfo",
 ];

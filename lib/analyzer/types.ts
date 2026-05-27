@@ -6,6 +6,22 @@ export type ArchitectureType =
   | "realtime-system"
   | "unknown";
 
+export type RepositoryPurpose =
+  | "developer-tooling"
+  | "saas-dashboard"
+  | "chat-application"
+  | "ecommerce-platform"
+  | "cms"
+  | "portfolio"
+  | "api-platform"
+  | "unknown";
+
+export interface PurposeResult {
+  name: RepositoryPurpose;
+  confidence: number; // Score from 0.0 to 1.0
+  matchedSignals: string[];
+}
+
 export type DetectionCategory =
   | "framework"
   | "database"
@@ -26,12 +42,48 @@ export interface DetectionResult {
   };
 }
 
+export interface CompressionStats {
+  originalBytes: number;
+  compressedBytes: number;
+  originalFilesCount: number;
+  compressedFilesCount: number;
+  savingsPercentage: number;
+}
+
+export interface AIReadinessScore {
+  score: number; // 0 to 100
+  breakdown: {
+    documentation: number;      // 0-20 points
+    typingQuality: number;      // 0-20 points
+    structureClarity: number;   // 0-20 points
+    configCompleteness: number;  // 0-20 points
+    contextOptimization: number; // 0-20 points
+  };
+  recommendations: string[];
+}
+
+export interface AIWorkflowPrompt {
+  title: string;
+  description: string;
+  prompt: string;
+}
+
 export interface ProjectAnalysis {
   technologies: DetectionResult[];
   architecture: ArchitectureType;
+  purpose: PurposeResult;
+  readinessScore: AIReadinessScore;
+  prompts: AIWorkflowPrompt[];
+  compression: CompressionStats;
   summary: string;
   fileCount: number;
   totalSize: number;
+  importanceStats: {
+    critical: number;
+    high: number;
+    normal: number;
+    low: number;
+  };
 }
 
 export interface HeuristicRule {

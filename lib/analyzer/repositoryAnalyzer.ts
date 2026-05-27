@@ -1,6 +1,11 @@
 import { ScannedFile } from "../scanner/fileTypes";
 import { TECHNOLOGY_RULES } from "./rules";
-import { ProjectAnalysis, DetectionResult, ArchitectureType } from "./types";
+import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "./types";
+
+import { calculateCompression } from "./compressionAnalyzer";
+import { analyzeReadiness } from "./readinessAnalyzer";
+import { generateWorkflows } from "./workflowGenerator";
+import { detectPurpose } from "./purposeDetector";
 
 interface ParsedPackageJson {
   path: string; // File path (e.g. "packages/web/package.json")
@@ -8,7 +13,11 @@ interface ParsedPackageJson {
   devDependencies: Record<string, string>;
 }
 
-export function analyzeRepository(files: ScannedFile[]): ProjectAnalysis {
+export function analyzeRepository(
+  files: ScannedFile[],
+  totalFilesCount: number = files.length,
+  ignoredCount: number = 0
+): ProjectAnalysis {
   const detections: Map<string, DetectionResult> = new Map();
   const parsedPackages: ParsedPackageJson[] = [];
 
@@ -105,18 +114,44 @@ export function analyzeRepository(files: ScannedFile[]): ProjectAnalysis {
     }
   }
 
-  // 3. Summarization & Fingerprinting
+  // 3. Sub-modules Orchestration
   const technologies = Array.from(detections.values());
   const architecture = detectArchitecture(parsedPackages, detections);
+  
+  // Extract parsed dependencies set for purpose detection
+  const dependenciesSet = new Set<string>();
+  for (const pkg of parsedPackages) {
+    Object.keys(pkg.dependencies).forEach(dep => dependenciesSet.add(dep));
+    Object.keys(pkg.devDependencies).forEach(dep => dependenciesSet.add(dep));
+  }
+  
+  const purpose = detectPurpose(files, dependenciesSet);
+  const readinessScore = analyzeReadiness(files, ignoredCount);
+  const prompts = generateWorkflows(architecture, technologies);
+  const compression = calculateCompression(files, totalFilesCount, ignoredCount);
+
+  // Compute file count per importance level cleanly
+  const importanceStats = {
+    critical: files.filter(f => f.importance === "critical").length,
+    high: files.filter(f => f.importance === "high").length,
+    normal: files.filter(f => f.importance === "normal").length,
+    low: files.filter(f => f.importance === "low").length,
+  };
+
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
-  const summary = generateSummaryText(technologies, architecture, files.length, totalSize);
+  const summary = generateSummaryText(technologies, architecture, purpose.name, files.length, totalSize);
 
   return {
     technologies,
     architecture,
+    purpose,
+    readinessScore,
+    prompts,
+    compression,
     summary,
     fileCount: files.length,
     totalSize,
+    importanceStats,
   };
 }
 
@@ -162,6 +197,7 @@ function detectArchitecture(
 function generateSummaryText(
   technologies: DetectionResult[],
   architecture: ArchitectureType,
+  purpose: RepositoryPurpose,
   fileCount: number,
   totalSize: number
 ): string {
@@ -178,8 +214,24 @@ function generateSummaryText(
     "unknown": "Software Repository"
   };
 
+  const purposeLabels: Record<RepositoryPurpose, string> = {
+    "developer-tooling": "Developer Tooling Project",
+    "saas-dashboard": "SaaS Dashboard Portal",
+    "chat-application": "Chat Application",
+    "ecommerce-platform": "Ecommerce Platform",
+    "cms": "Content Management System",
+    "portfolio": "Portfolio Website",
+    "api-platform": "API Platform Service",
+    "unknown": "Application"
+  };
+
   let summary = `Scanned ${fileCount} files (${(totalSize / 1024 / 1024).toFixed(2)} MB). `;
-  summary += `The codebase is classified as a ${archLabels[architecture]}. `;
+  
+  if (purpose !== "unknown") {
+    summary += `This project is classified as an AI-ready ${purposeLabels[purpose]} configured on a ${archLabels[architecture]} layout. `;
+  } else {
+    summary += `The codebase is classified as a ${archLabels[architecture]}. `;
+  }
 
   if (frameworks.length > 0) {
     summary += `Project is built using ${frameworks.join(" / ")}. `;

@@ -1,5 +1,5 @@
 import { shouldIgnore } from "../filters/shouldIgnore";
-
+import { detectImportance } from "./importanceDetector";
 import {
     ScannedFile,
     ScanResult,
@@ -63,6 +63,9 @@ export async function scanFiles(
                     }
                 }
 
+                // Detect importance
+                const importance = detectImportance(path, file.name);
+
                 return {
                     name: file.name,
                     path,
@@ -71,6 +74,7 @@ export async function scanFiles(
                     content,
                     included: true,
                     type,
+                    importance,
                 };
             })
         );
