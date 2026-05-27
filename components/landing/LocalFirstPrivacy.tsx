@@ -17,11 +17,11 @@ export default function LocalFirstPrivacy() {
                         <h3 className="text-base font-extrabold text-foreground tracking-tight font-sans">
                             Your source code never leaves your local machine
                         </h3>
-                        <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed font-sans">
+                        <p className="mt-2.5 text-[13px] text-muted-foreground leading-relaxed font-sans">
                             Packora is engineered entirely with client-side JavaScript. All directory file system traversal, technology and architecture analysis, and metadata summarization are compiled in your browser's local thread. We do not use remote servers, and we collect zero telemetry.
                         </p>
                     </div>
-                    <div className="rounded-xl border border-border bg-background p-4 shrink-0 flex flex-col gap-1 text-[10.5px] font-mono text-muted-foreground shadow-sm">
+                    <div className="rounded-xl border border-border bg-background p-4 shrink-0 flex flex-col gap-1.5 text-[11.5px] font-mono text-muted-foreground shadow-sm">
                         <div>Host environment: <span className="text-foreground font-semibold">Local Browser Thread</span></div>
                         <div>Remote connections: <span className="text-foreground font-semibold">Zero Networks</span></div>
                         <div>Persistence model: <span className="text-foreground font-semibold">Local Memory Only</span></div>

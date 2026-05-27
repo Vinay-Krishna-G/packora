@@ -187,27 +187,27 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
                 ) : (
                     /* Active Dashboard Views */
                     <div className="space-y-8 animate-fadeIn">
-                        {/* Summary statistics grid */}
-                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 text-xs font-mono w-full min-w-0 select-none">
+                        {/* Summary statistics grid (Micro upscaling for crisp reading) */}
+                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 text-[12.5px] font-mono w-full min-w-0 select-none">
                             <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
-                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Total files</div>
-                                <div className="mt-1 text-sm font-bold text-foreground">{totalFiles}</div>
+                                <div className="text-muted-foreground uppercase tracking-wider text-[9px] font-bold">Total files</div>
+                                <div className="mt-1 text-[14.5px] font-bold text-foreground">{totalFiles}</div>
                             </div>
                             <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
-                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Included files</div>
-                                <div className="mt-1 text-sm font-bold text-foreground">{includedCount}</div>
+                                <div className="text-muted-foreground uppercase tracking-wider text-[9px] font-bold">Included files</div>
+                                <div className="mt-1 text-[14.5px] font-bold text-foreground">{includedCount}</div>
                             </div>
                             <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
-                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Ignored files</div>
-                                <div className="mt-1 text-sm font-bold text-foreground">{ignoredCount}</div>
+                                <div className="text-muted-foreground uppercase tracking-wider text-[9px] font-bold">Ignored files</div>
+                                <div className="mt-1 text-[14.5px] font-bold text-foreground">{ignoredCount}</div>
                             </div>
                             <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm col-span-2 sm:col-span-1 md:col-span-1">
-                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Export size</div>
-                                <div className="mt-1 text-sm font-bold text-foreground truncate">{formattedExportSize}</div>
+                                <div className="text-muted-foreground uppercase tracking-wider text-[9px] font-bold">Export size</div>
+                                <div className="mt-1 text-[14.5px] font-bold text-foreground truncate">{formattedExportSize}</div>
                             </div>
                             <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm col-span-2 sm:col-span-2 md:col-span-1">
-                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Scan time</div>
-                                <div className="mt-1 text-sm font-bold text-foreground">{processingTime}s</div>
+                                <div className="text-muted-foreground uppercase tracking-wider text-[9px] font-bold">Scan time</div>
+                                <div className="mt-1 text-[14.5px] font-bold text-foreground">{processingTime}s</div>
                             </div>
                         </div>
 

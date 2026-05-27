@@ -31,8 +31,8 @@ export default function Hero({ onOpenApp }: HeroProps) {
                 Transform repositories into structured development context.
             </h1>
 
-            {/* Concise Hero Description (Breathes visually, easy scanning) */}
-            <p className="mt-6 max-w-xl text-sm sm:text-base text-muted-foreground font-sans leading-relaxed animate-fadeIn" style={{ animationDelay: "100ms" }}>
+            {/* Concise Hero Description (Refined to 14.5px/17px for fluid scanning) */}
+            <p className="mt-6 max-w-xl text-[14.5px] sm:text-[17px] text-muted-foreground font-sans leading-relaxed tracking-normal animate-fadeIn" style={{ animationDelay: "100ms" }}>
                 Local-first repository processing directly in your browser. <br className="hidden sm:inline" />
                 Packora filters repository noise and exports structured development context optimized for AI-assisted workflows.
             </p>

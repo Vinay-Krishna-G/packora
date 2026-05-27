@@ -106,7 +106,7 @@ export default function FileList({
     };
 
     return (
-        <div className="mt-6 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm">
+        <div className="mt-6 rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm animate-fadeIn">
             {/* Header controls bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4 mb-5 select-none">
                 <h3 className="text-sm font-bold text-foreground tracking-tight">
@@ -172,8 +172,6 @@ export default function FileList({
                             <option value="size">File Size</option>
                         </select>
                     </div>
-
-                    {/* Note: The UI Group-by filter controls are hidden initially to maintain visual clarity and reduce cognitive overload, but the internal categorizeFile architecture is fully ready for scalability. */}
                 </div>
             </div>
 
@@ -202,13 +200,13 @@ export default function FileList({
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full min-w-0">
                                     <div className="flex flex-col min-w-0 w-full break-all">
                                         <div className="flex items-center gap-2 flex-wrap min-w-0 w-full">
-                                            {/* Folder Hover Trigger */}
+                                            {/* Folder Hover Trigger (Micro upscaling to text-12px/12.5px to reduce visual compression) */}
                                             <div className="group relative min-w-0 max-w-full">
-                                                <span className="block truncate text-foreground/90 font-mono text-[11px] sm:text-[11.5px] cursor-help border-b border-dashed border-border pb-0.5 hover:text-foreground hover:border-border/80 transition">
+                                                <span className="block truncate text-foreground/90 font-mono text-[12px] sm:text-[12.5px] cursor-help border-b border-dashed border-border pb-0.5 hover:text-foreground hover:border-border/80 transition">
                                                     {file.path}
                                                 </span>
                                                 {dirSem && (
-                                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-[calc(100vw-3rem)] sm:w-72 rounded-xl border border-border bg-card p-4 text-[10px] text-muted-foreground font-mono shadow-2xl leading-relaxed select-none animate-fadeIn">
+                                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-[calc(100vw-3rem)] sm:w-72 rounded-xl border border-border bg-card p-4 text-[11px] text-muted-foreground font-mono shadow-2xl leading-relaxed select-none animate-fadeIn">
                                                         <div className="font-bold text-foreground uppercase tracking-wider mb-1.5 text-[8px]">// Folder: /{folderPath}</div>
                                                         {dirSem.summary}
                                                     </div>
@@ -247,9 +245,9 @@ export default function FileList({
                                             </span>
                                         </div>
 
-                                        {/* Inline Semantic Summary text line */}
+                                        {/* Inline Semantic Summary text line (Micro upscaled with relaxed leading) */}
                                         {sem?.summary && (
-                                            <div className="mt-1.5 text-[11px] sm:text-[11.5px] text-muted-foreground font-mono leading-relaxed max-w-3xl">
+                                            <div className="mt-1.5 text-[12px] sm:text-[12.5px] text-muted-foreground font-mono leading-relaxed max-w-3xl">
                                                 {sem.summary}
                                             </div>
                                         )}
@@ -259,9 +257,9 @@ export default function FileList({
                                     <button
                                         onClick={() => onToggle(file.path)}
                                         className={`
-                                            rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition shrink-0 font-mono self-start sm:self-center cursor-pointer select-none shadow-sm
+                                            rounded-lg px-2.5 py-1.5 text-[11.5px] font-semibold transition shrink-0 font-mono self-start sm:self-center cursor-pointer select-none shadow-sm
                                             ${file.included
-                                                ? "bg-green-600/10 text-green-650 dark:text-green-400 border-green-600/20"
+                                                ? "bg-green-600/10 text-green-650 dark:text-green-400 border border-green-600/20 hover:bg-green-600/20"
                                                 : "bg-card text-muted-foreground border border-border hover:bg-background"
                                             }
                                         `}

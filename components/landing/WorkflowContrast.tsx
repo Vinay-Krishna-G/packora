@@ -26,7 +26,7 @@ export default function WorkflowContrast() {
                                 </h3>
                             </div>
 
-                            <ul className="space-y-4 text-xs font-mono text-muted-foreground leading-relaxed">
+                            <ul className="space-y-4 text-[12.5px] font-mono text-muted-foreground tracking-tight leading-relaxed">
                                 <li className="flex items-start gap-2.5">
                                     <span className="text-red-500/60 mt-0.5">•</span>
                                     <span>Manually copying and pasting source files one by one.</span>
@@ -45,7 +45,7 @@ export default function WorkflowContrast() {
                                 </li>
                             </ul>
                         </div>
-                        <div className="mt-8 pt-4 border-t border-red-500/5 text-[10.5px] font-mono text-red-500/50">
+                        <div className="mt-8 pt-4 border-t border-red-500/5 text-[11.5px] font-mono text-red-500/50 leading-relaxed">
                             Result: Fragmented context and high noise ratio.
                         </div>
                     </div>
@@ -60,7 +60,7 @@ export default function WorkflowContrast() {
                                 </h3>
                             </div>
 
-                            <ul className="space-y-4 text-xs font-mono text-muted-foreground leading-relaxed">
+                            <ul className="space-y-4 text-[12.5px] font-mono text-muted-foreground tracking-tight leading-relaxed">
                                 <li className="flex items-start gap-2.5">
                                     <span className="text-emerald-500/60 mt-0.5">•</span>
                                     <span>Import whole folder locally in 1-click inside your browser thread.</span>
@@ -79,7 +79,7 @@ export default function WorkflowContrast() {
                                 </li>
                             </ul>
                         </div>
-                        <div className="mt-8 pt-4 border-t border-emerald-500/5 text-[10.5px] font-mono text-emerald-500/60">
+                        <div className="mt-8 pt-4 border-t border-emerald-500/5 text-[11.5px] font-mono text-emerald-500/60 leading-relaxed">
                             Result: Clean, size-optimized repository context; instant understanding.
                         </div>
                     </div>
