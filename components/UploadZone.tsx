@@ -83,6 +83,12 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
         downloadFile(exportContent, customFilename);
     };
 
+    const handleDirectDownload = () => {
+        if (!exportContent) return;
+        const filename = `packora-context.${exportFormat === "markdown" ? "md" : "xml"}`;
+        handleDownload(filename);
+    };
+
     function toggleFile(path: string) {
         setFiles((previousFiles) =>
             previousFiles.map((file) =>
@@ -128,6 +134,7 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
                     setExportIntent={setExportIntent}
                     onPreviewClick={() => setIsPreviewOpen(true)}
                     onCopyClick={handleCopy}
+                    onDownloadClick={handleDirectDownload}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     filesCount={files.length}

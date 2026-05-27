@@ -53,9 +53,9 @@ export default function RepositoryInsights({
     // Helper to evaluate soft, qualitative readiness rating
     const readinessLabel = useMemo(() => {
         const score = readinessScore.score;
-        if (score >= 80) return "Strong";
-        if (score >= 50) return "Moderate";
-        return "Basic";
+        if (score >= 80) return "Strong context quality";
+        if (score >= 50) return "Moderate context quality";
+        return "Basic context quality";
     }, [readinessScore.score]);
 
     // Format compression sizes to MB/KB to prevent API credit token confusion
@@ -72,10 +72,10 @@ export default function RepositoryInsights({
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4 mb-6 select-none">
                 <div>
                     <h2 className="text-sm font-bold text-foreground tracking-tight">
-                        Repository analysis
+                        Repository insights
                     </h2>
                     <p className="mt-1 text-[11px] text-muted-foreground font-mono">
-                        Structure and technology overview.
+                        Project architecture and technology overview.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-[10px] font-mono font-semibold uppercase tracking-wider">
@@ -153,7 +153,7 @@ export default function RepositoryInsights({
 
                 {/* Scorecard */}
                 <div className="rounded-xl border border-border bg-card/30 p-5 font-mono text-xs shadow-sm">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// AI context readiness</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// Context quality scorecard</span>
                     <div className="grid gap-4 sm:grid-cols-2">
                         {/* Score Breakdown list */}
                         <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-foreground shadow-sm">
@@ -178,7 +178,7 @@ export default function RepositoryInsights({
 
                         {/* Recommendations checklist */}
                         <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-muted-foreground shadow-sm">
-                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Heuristic adjustments:</span>
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Grounded adjustments:</span>
                             {readinessScore.recommendations.slice(0, 3).map(rec => (
                                 <div key={rec} className="text-[10.5px] leading-normal flex items-start gap-1">
                                     <span className="text-amber-500 select-none">•</span>

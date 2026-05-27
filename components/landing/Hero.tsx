@@ -28,11 +28,13 @@ export default function Hero({ onOpenApp }: HeroProps) {
 
             {/* Premium Typography Focus */}
             <h1 className="max-w-3xl text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.15] text-foreground font-sans animate-fadeIn">
-                Structured repository context generation for AI-assisted development workflows.
+                Transform repositories into structured development context.
             </h1>
 
+            {/* Concise Hero Description (Breathes visually, easy scanning) */}
             <p className="mt-6 max-w-xl text-sm sm:text-base text-muted-foreground font-sans leading-relaxed animate-fadeIn" style={{ animationDelay: "100ms" }}>
-                Transform repositories into semantic, AI-readable context directly inside your browser. No repository uploads required. Eliminate noise, bypass token limits, and supercharge onboardings.
+                Local-first repository processing directly in your browser. <br className="hidden sm:inline" />
+                Packora filters repository noise and exports structured development context optimized for AI-assisted workflows.
             </p>
 
             {/* CTAs Group */}

@@ -12,6 +12,7 @@ type StickyToolbarProps = {
     setExportIntent: (intent: ExportIntent) => void;
     onPreviewClick: () => void;
     onCopyClick: () => void;
+    onDownloadClick: () => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     filesCount: number;
@@ -29,6 +30,7 @@ export default function StickyToolbar({
     setExportIntent,
     onPreviewClick,
     onCopyClick,
+    onDownloadClick,
     searchQuery,
     setSearchQuery,
     filesCount,
@@ -107,7 +109,7 @@ export default function StickyToolbar({
                                 Configure
                             </button>
 
-                            {/* Copy / Export Buttons */}
+                            {/* Copy / Download / Preview Buttons (Download as primary, Copy/Preview as secondary) */}
                             <div className="flex items-center gap-2">
                                 <ThemeToggle />
                                 
@@ -125,14 +127,23 @@ export default function StickyToolbar({
                                 >
                                     {copied ? "Copied" : "Copy"}
                                 </button>
-                                
+
                                 <button
                                     type="button"
                                     onClick={onPreviewClick}
                                     disabled={filesCount === 0}
-                                    className="rounded-lg border border-accent bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-40 disabled:hover:bg-accent disabled:cursor-not-allowed transition shrink-0 font-mono cursor-pointer select-none shadow-md"
+                                    className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:border-border/80 hover:bg-muted/40 disabled:opacity-40 disabled:hover:bg-card disabled:cursor-not-allowed transition shrink-0 font-mono cursor-pointer select-none shadow-sm"
                                 >
                                     Preview
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    onClick={onDownloadClick}
+                                    disabled={filesCount === 0}
+                                    className="rounded-lg border border-accent bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-40 disabled:hover:bg-accent disabled:cursor-not-allowed transition shrink-0 font-mono cursor-pointer select-none shadow-md"
+                                >
+                                    Download
                                 </button>
                             </div>
                         </div>

@@ -9,6 +9,9 @@ type FileListProps = {
     semanticAnalysis?: SemanticRepositoryAnalysis;
 };
 
+// Internal scalability groupings types
+type FileGroup = "frontend" | "backend" | "infrastructure" | "config" | "utilities" | "shared" | "other";
+
 export default function FileList({
     files,
     onToggle,
@@ -19,6 +22,30 @@ export default function FileList({
     const [importanceFilter, setImportanceFilter] = useState<"all" | "critical" | "high" | "normal" | "low">("all");
     const [typeFilter, setTypeFilter] = useState<"all" | FileType>("all");
     const [sortKey, setSortKey] = useState<"name" | "size">("name");
+
+    // Internal future-ready categorization algorithm (kept ready for grouping scalability)
+    const categorizeFile = (path: string): FileGroup => {
+        const lower = path.toLowerCase();
+        if (lower.includes("config") || lower.endsWith(".json") || lower.endsWith(".yaml") || lower.endsWith(".yml") || lower.startsWith(".")) {
+            return "config";
+        }
+        if (lower.includes("infra") || lower.includes("docker") || lower.includes("k8s") || lower.includes("deploy") || lower.includes(".github")) {
+            return "infrastructure";
+        }
+        if (lower.includes("frontend") || lower.includes("components") || lower.includes("styles") || lower.includes("pages") || lower.includes("views")) {
+            return "frontend";
+        }
+        if (lower.includes("backend") || lower.includes("controllers") || lower.includes("routes") || lower.includes("models") || lower.includes("api/")) {
+            return "backend";
+        }
+        if (lower.includes("utils") || lower.includes("helpers") || lower.includes("lib/") || lower.includes("services")) {
+            return "utilities";
+        }
+        if (lower.includes("shared") || lower.includes("common") || lower.includes("types/")) {
+            return "shared";
+        }
+        return "other";
+    };
 
     // Single-pass high performance filter & sort pipeline
     const processedFiles = useMemo(() => {
@@ -145,6 +172,8 @@ export default function FileList({
                             <option value="size">File Size</option>
                         </select>
                     </div>
+
+                    {/* Note: The UI Group-by filter controls are hidden initially to maintain visual clarity and reduce cognitive overload, but the internal categorizeFile architecture is fully ready for scalability. */}
                 </div>
             </div>
 
@@ -232,7 +261,7 @@ export default function FileList({
                                         className={`
                                             rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition shrink-0 font-mono self-start sm:self-center cursor-pointer select-none shadow-sm
                                             ${file.included
-                                                ? "bg-green-600/10 text-green-650 dark:text-green-400 border border-green-600/20 hover:bg-green-600/20"
+                                                ? "bg-green-600/10 text-green-650 dark:text-green-400 border-green-600/20"
                                                 : "bg-card text-muted-foreground border border-border hover:bg-background"
                                             }
                                         `}
