@@ -14,6 +14,11 @@ import { estimateTokens }
 import FileList
     from "./preview/FileList";
 
+import RepositoryInsights
+    from "./preview/RepositoryInsights";
+
+import { analyzeRepository } from "@/lib/analyzer/repositoryAnalyzer";
+
 export default function UploadZone() {
 
     const [ignoredCount, setIgnoredCount] = useState(0);
@@ -26,6 +31,11 @@ export default function UploadZone() {
     const exportContent = useMemo(() => {
         return generateMarkdown(files, exportFormat);
     }, [files, exportFormat]);
+
+    // Dynamically derive repository intelligence heuristics
+    const repositoryAnalysis = useMemo(() => {
+        return analyzeRepository(files);
+    }, [files]);
 
     // Dynamically derive estimated tokens based on the exported content
     const estimatedTokens = useMemo(() => {
@@ -166,7 +176,7 @@ export default function UploadZone() {
                             {processingTime}s
                         </div>
                     </div>
-                </div>
+                </div>                <RepositoryInsights analysis={repositoryAnalysis} />
 
                 <div className="mt-8">
                     <h2 className="text-xl font-semibold">

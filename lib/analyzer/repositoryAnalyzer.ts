@@ -1,6 +1,6 @@
 import { ScannedFile } from "../scanner/fileTypes";
 import { TECHNOLOGY_RULES } from "./rules";
-import { ProjectAnalysis, DetectionResult } from "./types";
+import { ProjectAnalysis, DetectionResult, ArchitectureType } from "./types";
 
 interface ParsedPackageJson {
   path: string; // File path (e.g. "packages/web/package.json")
@@ -105,21 +105,63 @@ export function analyzeRepository(files: ScannedFile[]): ProjectAnalysis {
     }
   }
 
-  // 3. Summarization
+  // 3. Summarization & Fingerprinting
   const technologies = Array.from(detections.values());
+  const architecture = detectArchitecture(parsedPackages, detections);
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
-  const summary = generateSummaryText(technologies, files.length, totalSize);
+  const summary = generateSummaryText(technologies, architecture, files.length, totalSize);
 
   return {
     technologies,
+    architecture,
     summary,
     fileCount: files.length,
     totalSize,
   };
 }
 
+function detectArchitecture(
+  parsedPackages: ParsedPackageJson[],
+  detections: Map<string, DetectionResult>
+): ArchitectureType {
+  // 1. Monorepo Detection
+  if (parsedPackages.length > 1) {
+    return "monorepo";
+  }
+
+  const hasFramework = (name: string) => detections.has(name);
+  const hasCategory = (cat: string) => Array.from(detections.values()).some((d) => d.category === cat);
+
+  // 2. Realtime Systems
+  if (hasCategory("realtime")) {
+    return "realtime-system";
+  }
+
+  // 3. Fullstack Monolith (Next.js, Nuxt/Vue, SvelteKit + Database layers)
+  const isFullstackFramework = hasFramework("Next.js") || hasFramework("Svelte / SvelteKit") || hasFramework("Vue.js");
+  const hasDb = hasCategory("database");
+  if (isFullstackFramework && hasDb) {
+    return "fullstack-monolith";
+  }
+
+  // 4. Backend API
+  const isBackendFramework = hasFramework("Express.js") || hasFramework("NestJS");
+  if (isBackendFramework && hasDb && !hasFramework("React")) {
+    return "backend-api";
+  }
+
+  // 5. Frontend Only
+  const hasFrontendStylingOrState = hasCategory("styling") || hasCategory("state-management");
+  if ((hasFramework("React") || hasFramework("Vue.js") || hasFramework("Angular")) && !hasDb) {
+    return "frontend-only";
+  }
+
+  return "unknown";
+}
+
 function generateSummaryText(
   technologies: DetectionResult[],
+  architecture: ArchitectureType,
   fileCount: number,
   totalSize: number
 ): string {
@@ -127,7 +169,17 @@ function generateSummaryText(
   const databases = technologies.filter((t) => t.category === "database").map((t) => t.name);
   const styling = technologies.filter((t) => t.category === "styling").map((t) => t.name);
 
+  const archLabels: Record<ArchitectureType, string> = {
+    "monorepo": "Monorepo Workspace",
+    "fullstack-monolith": "Fullstack Monolith",
+    "frontend-only": "Frontend Application",
+    "backend-api": "Backend API Service",
+    "realtime-system": "Realtime Application",
+    "unknown": "Software Repository"
+  };
+
   let summary = `Scanned ${fileCount} files (${(totalSize / 1024 / 1024).toFixed(2)} MB). `;
+  summary += `The codebase is classified as a ${archLabels[architecture]}. `;
 
   if (frameworks.length > 0) {
     summary += `Project is built using ${frameworks.join(" / ")}. `;

@@ -1,3 +1,11 @@
+export type ArchitectureType =
+  | "monorepo"
+  | "fullstack-monolith"
+  | "frontend-only"
+  | "backend-api"
+  | "realtime-system"
+  | "unknown";
+
 export type DetectionCategory =
   | "framework"
   | "database"
@@ -20,6 +28,7 @@ export interface DetectionResult {
 
 export interface ProjectAnalysis {
   technologies: DetectionResult[];
+  architecture: ArchitectureType;
   summary: string;
   fileCount: number;
   totalSize: number;
