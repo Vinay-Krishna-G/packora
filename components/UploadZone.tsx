@@ -15,6 +15,7 @@ import FileList from "./preview/FileList";
 import RepositoryInsights from "./preview/RepositoryInsights";
 import StickyToolbar from "./ui/StickyToolbar";
 import ExportPreviewModal from "./preview/ExportPreviewModal";
+import Footer from "./ui/Footer";
 
 import { analyzeRepository } from "@/lib/analyzer/repositoryAnalyzer";
 
@@ -208,6 +209,9 @@ export default function UploadZone() {
                         />
                     </div>
                 )}
+                
+                {/* Reusable premium developer tool footer */}
+                <Footer />
             </div>
 
             {/* Premium Export Preview modal overlay */}

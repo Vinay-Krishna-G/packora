@@ -1,0 +1,98 @@
+import React from "react";
+
+// ============================================================================
+// EDITABLE FOOTER CONFIGURATION OBJECT
+// ============================================================================
+// Edit this object directly to change any text, links, or version information in the footer!
+// ============================================================================
+export const FOOTER_CONFIG = {
+    productName: "Packora",
+    version: "v0.1.0",
+    copyright: "© 2026 Packora",
+    description: "Structured repository context generation for AI-assisted development workflows.",
+    privacyStatement: "All repository processing happens locally in your browser.",
+    builtBy: "Built by Vinay Krishna",
+
+    // Developer Contact & Project Repository Links
+    links: {
+        github: "https://github.com/Vinay-Krishna-G/",
+        linkedin: "https://www.linkedin.com/in/vinay-krishna-gudikandula-44b889279/",
+        bugReportEmail: "vinaykrishna1515@gmail.com"
+    }
+};
+
+export default function Footer() {
+    const { productName, version, copyright, description, privacyStatement, builtBy, links } = FOOTER_CONFIG;
+
+    return (
+        <footer className="mt-20 border-t border-zinc-900 pt-8 pb-12 font-mono text-[11px] text-zinc-550 select-none">
+            <div className="flex flex-col md:flex-row md:justify-between gap-6 md:gap-4">
+
+                {/* LEFT BLOCK: Identity, Description & Security Heuristics */}
+                <div className="flex flex-col gap-2 max-w-sm">
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-zinc-300 tracking-wider uppercase text-xs">
+                            {productName}
+                        </span>
+                        <span className="rounded bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[9px] font-normal text-zinc-400">
+                            {version}
+                        </span>
+                    </div>
+                    <p className="text-zinc-500 leading-relaxed font-sans text-xs">
+                        {description}
+                    </p>
+                    <div className="flex items-center gap-1.5 text-zinc-650 mt-1">
+                        <svg className="h-3.5 w-3.5 shrink-0 text-emerald-600/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span className="font-sans text-[10.5px]">
+                            {privacyStatement}
+                        </span>
+                    </div>
+                </div>
+
+                {/* RIGHT BLOCK: Links & Author Details */}
+                <div className="flex flex-col md:items-end justify-between gap-4">
+                    {/* Navigation handles */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-zinc-450">
+                        <a
+                            href={links.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-zinc-200 transition border-b border-zinc-900 hover:border-zinc-500 pb-0.5"
+                        >
+                            GitHub
+                        </a>
+                        <a
+                            href={links.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-zinc-200 transition border-b border-zinc-900 hover:border-zinc-500 pb-0.5"
+                        >
+                            LinkedIn
+                        </a>
+                        <a
+                            href={`mailto:${links.bugReportEmail}?subject=Packora Bug Report`}
+                            className="hover:text-zinc-200 transition border-b border-zinc-900 hover:border-zinc-500 pb-0.5"
+                        >
+                            Report Bug
+                        </a>
+                    </div>
+
+                    {/* builtBy info */}
+                    <div className="text-zinc-650 text-[10px]">
+                        <span>{builtBy}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* BOTTOM ROW: Copyright legal parameters */}
+            <div className="mt-8 border-t border-zinc-950 pt-4 flex flex-col sm:flex-row sm:justify-between gap-2 text-zinc-650 text-[10px]">
+                <div>{copyright}</div>
+                <div className="text-[9.5px] uppercase tracking-wider text-zinc-700">
+                    Client-Side Isolation verified
+                </div>
+            </div>
+        </footer>
+    );
+}
