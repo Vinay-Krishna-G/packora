@@ -56,7 +56,7 @@ export default function ExportPreviewModal({
 
     return (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl transition duration-200">
+            <div className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-6 shadow-2xl transition duration-200 min-w-0">
                 
                 {/* Header Section */}
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-4">
@@ -123,8 +123,8 @@ export default function ExportPreviewModal({
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
                         Context Blueprint Preview
                     </span>
-                    <div className="mt-2 relative">
-                        <div className="mt-2 h-[200px] overflow-auto rounded-xl border border-zinc-900 bg-zinc-950 p-4 text-[11px] text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap select-all pr-16">
+                    <div className="mt-2 relative w-full min-w-0">
+                        <div className="mt-2 h-[200px] overflow-y-auto overflow-x-hidden rounded-xl border border-zinc-900 bg-zinc-950 p-4 text-[11px] text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap select-all pr-16 break-all w-full">
                             {previewSnippet}
                         </div>
                         <button

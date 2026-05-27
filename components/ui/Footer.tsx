@@ -26,10 +26,10 @@ export default function Footer() {
 
     return (
         <footer className="mt-20 border-t border-zinc-900 pt-8 pb-12 font-mono text-[11px] text-zinc-550 select-none">
-            <div className="flex flex-col md:flex-row md:justify-between gap-6 md:gap-4">
+            <div className="flex flex-col md:flex-row md:justify-between gap-6 md:gap-4 w-full min-w-0">
 
                 {/* LEFT BLOCK: Identity, Description & Security Heuristics */}
-                <div className="flex flex-col gap-2 max-w-sm">
+                <div className="flex flex-col gap-2 w-full md:max-w-sm">
                     <div className="flex items-center gap-2">
                         <span className="font-bold text-zinc-300 tracking-wider uppercase text-xs">
                             {productName}
@@ -52,9 +52,9 @@ export default function Footer() {
                 </div>
 
                 {/* RIGHT BLOCK: Links & Author Details */}
-                <div className="flex flex-col md:items-end justify-between gap-4">
+                <div className="flex flex-col md:items-end justify-between gap-4 w-full md:w-auto">
                     {/* Navigation handles */}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-zinc-450">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-zinc-450 w-full md:justify-end">
                         <a
                             href={links.github}
                             target="_blank"
@@ -80,14 +80,14 @@ export default function Footer() {
                     </div>
 
                     {/* builtBy info */}
-                    <div className="text-zinc-650 text-[10px]">
+                    <div className="text-zinc-650 text-[10px] w-full md:text-right">
                         <span>{builtBy}</span>
                     </div>
                 </div>
             </div>
 
             {/* BOTTOM ROW: Copyright legal parameters */}
-            <div className="mt-8 border-t border-zinc-950 pt-4 flex flex-col sm:flex-row sm:justify-between gap-2 text-zinc-650 text-[10px]">
+            <div className="mt-8 border-t border-zinc-950 pt-4 flex flex-col md:flex-row md:justify-between gap-2 text-zinc-650 text-[10px] w-full">
                 <div>{copyright}</div>
                 <div className="text-[9.5px] uppercase tracking-wider text-zinc-700">
                     Client-Side Isolation verified

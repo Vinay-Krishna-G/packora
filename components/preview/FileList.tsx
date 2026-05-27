@@ -170,16 +170,16 @@ export default function FileList({
                                 key={file.path}
                                 className="py-3.5 text-xs transition duration-150"
                             >
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex flex-col min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full min-w-0">
+                                    <div className="flex flex-col min-w-0 w-full break-all">
+                                        <div className="flex items-center gap-2 flex-wrap min-w-0 w-full">
                                             {/* Folder Hover Trigger */}
-                                            <div className="group relative shrink-0">
-                                                <span className="truncate text-zinc-300 font-mono text-[11px] cursor-help border-b border-dashed border-zinc-800 pb-0.5 hover:text-white hover:border-zinc-600 transition">
+                                            <div className="group relative min-w-0 max-w-full">
+                                                <span className="block truncate text-zinc-300 font-mono text-[11px] cursor-help border-b border-dashed border-zinc-800 pb-0.5 hover:text-white hover:border-zinc-600 transition">
                                                     {file.path}
                                                 </span>
                                                 {dirSem && (
-                                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-72 rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-[10px] text-zinc-400 font-mono shadow-2xl leading-relaxed select-none animate-fadeIn">
+                                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-[calc(100vw-3rem)] sm:w-72 rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-[10px] text-zinc-400 font-mono shadow-2xl leading-relaxed select-none animate-fadeIn">
                                                         <div className="font-bold text-zinc-300 uppercase tracking-wider mb-1 text-[8px]">// Folder: /{folderPath}</div>
                                                         {dirSem.summary}
                                                     </div>
@@ -230,7 +230,7 @@ export default function FileList({
                                     <button
                                         onClick={() => onToggle(file.path)}
                                         className={`
-                                            rounded-lg px-2.5 py-1 text-[11px] font-semibold transition shrink-0 font-mono
+                                            rounded-lg px-2.5 py-1 text-[11px] font-semibold transition shrink-0 font-mono self-start sm:self-center
                                             ${file.included
                                                 ? "bg-green-600/10 text-green-400 border border-green-800/30 hover:bg-green-600/20"
                                                 : "bg-zinc-900/60 text-zinc-500 border border-zinc-900 hover:bg-zinc-800"

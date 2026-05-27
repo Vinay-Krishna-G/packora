@@ -49,7 +49,7 @@ export default function StickyToolbar({
     }, [searchQuery]);
 
     return (
-        <div className="sticky top-0 z-40 -mx-8 mb-8 border-b border-zinc-900 bg-zinc-950/85 px-8 py-3.5 backdrop-blur-md">
+        <div className="sticky top-0 z-40 -mx-4 sm:-mx-8 mb-8 border-b border-zinc-900 bg-zinc-950/85 px-4 sm:px-8 py-3.5 backdrop-blur-md">
             <div className="flex flex-col gap-1">
                 {/* Primary Actions Row */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -72,59 +72,61 @@ export default function StickyToolbar({
                     </div>
 
                     {/* Quick Search & Main Action Controls */}
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                         {/* Debounced Search Field */}
                         <input
                             type="text"
                             placeholder="Quick filter path..."
                             value={localQuery}
                             onChange={(e) => setLocalQuery(e.target.value)}
-                            className="w-full sm:w-[180px] rounded-lg border border-zinc-900 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-300 outline-none placeholder-zinc-600 focus:border-zinc-800 transition font-mono"
+                            className="w-full sm:w-[160px] md:w-[180px] rounded-lg border border-zinc-900 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-300 outline-none placeholder-zinc-650 focus:border-zinc-800 transition font-mono"
                         />
 
-                        {/* Configure Drawer Toggle */}
-                        <button
-                            onClick={() => setShowAdvanced(!showAdvanced)}
-                            className={`
-                                rounded-lg border px-3 py-1.5 text-xs font-bold transition flex items-center gap-1.5 font-mono shrink-0
-                                ${showAdvanced
-                                    ? "bg-zinc-800 border-zinc-700 text-white"
-                                    : "bg-zinc-900 border-zinc-900 text-zinc-400 hover:text-zinc-300 hover:border-zinc-800"
-                                }
-                            `}
-                        >
-                            <svg className={`h-3.5 w-3.5 transition-transform duration-200 ${showAdvanced ? 'rotate-45' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            Configure
-                        </button>
-
-                        {/* Copy / Export Buttons */}
-                        <div className="flex items-center gap-2 ml-auto lg:ml-2">
+                        <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
+                            {/* Configure Drawer Toggle */}
                             <button
-                                type="button"
-                                onClick={onCopyClick}
-                                disabled={filesCount === 0}
+                                onClick={() => setShowAdvanced(!showAdvanced)}
                                 className={`
-                                    rounded-lg border px-3 py-1.5 text-xs font-bold transition shrink-0 font-mono
-                                    ${copied
-                                        ? "bg-green-950/60 text-green-400 border-green-800/40"
-                                        : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700 disabled:opacity-40"
+                                    rounded-lg border px-3 py-1.5 text-xs font-bold transition flex items-center gap-1.5 font-mono shrink-0
+                                    ${showAdvanced
+                                        ? "bg-zinc-800 border-zinc-700 text-white"
+                                        : "bg-zinc-900 border-zinc-900 text-zinc-400 hover:text-zinc-300 hover:border-zinc-800"
                                     }
                                 `}
                             >
-                                {copied ? "Copied" : "Copy"}
+                                <svg className={`h-3.5 w-3.5 transition-transform duration-200 ${showAdvanced ? 'rotate-45' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Configure
                             </button>
-                            
-                            <button
-                                type="button"
-                                onClick={onPreviewClick}
-                                disabled={filesCount === 0}
-                                className="rounded-lg border border-white bg-white px-3 py-1.5 text-xs font-bold text-black hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-white transition shrink-0 font-mono"
-                            >
-                                Preview & Export
-                            </button>
+
+                            {/* Copy / Export Buttons */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={onCopyClick}
+                                    disabled={filesCount === 0}
+                                    className={`
+                                        rounded-lg border px-3 py-1.5 text-xs font-bold transition shrink-0 font-mono
+                                        ${copied
+                                            ? "bg-green-950/60 text-green-400 border-green-800/40"
+                                            : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700 disabled:opacity-40"
+                                        }
+                                    `}
+                                >
+                                    {copied ? "Copied" : "Copy"}
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    onClick={onPreviewClick}
+                                    disabled={filesCount === 0}
+                                    className="rounded-lg border border-white bg-white px-3 py-1.5 text-xs font-bold text-black hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-white transition shrink-0 font-mono"
+                                >
+                                    Preview
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

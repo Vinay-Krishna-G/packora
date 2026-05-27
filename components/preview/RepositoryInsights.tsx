@@ -180,10 +180,10 @@ export default function RepositoryInsights({
                         {semanticAnalysis.flows.map(flow => (
                             <div key={flow.name} className="rounded-lg border border-zinc-900/60 bg-zinc-950/45 p-3">
                                 <div className="text-[10px] font-bold text-zinc-300 mb-2">// {flow.name}</div>
-                                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[10px]">
                                     {flow.steps.map((step, idx) => (
-                                        <div key={step} className="flex items-center gap-1.5">
-                                            {idx > 0 && <span className="text-zinc-650 font-bold font-sans">➔</span>}
+                                        <div key={step} className="flex items-center gap-1.5 py-0.5">
+                                            {idx > 0 && <span className="text-zinc-650 font-bold font-sans self-center select-none text-[8.5px]">➔</span>}
                                             <span className={`
                                                 px-2 py-0.5 rounded border text-[9.5px] font-semibold
                                                 ${step.includes("API endpoint") || step.startsWith("POST ") || step.startsWith("GET ")

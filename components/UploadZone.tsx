@@ -109,8 +109,8 @@ export default function UploadZone() {
     }
 
     return (
-        <main className="min-h-screen bg-black text-white p-8">
-            <div className="mx-auto max-w-4xl">
+        <main className="min-h-screen bg-black text-white p-4 sm:p-8">
+            <div className="mx-auto max-w-4xl w-full min-w-0">
                 {/* Sticky Toolbar Widget */}
                 <StickyToolbar
                     onUploadClick={triggerUpload}
@@ -163,18 +163,18 @@ export default function UploadZone() {
                             transition hover:border-zinc-800 hover:bg-zinc-950 duration-200
                         "
                     >
-                        <p className="text-sm font-semibold text-zinc-300">
-                            Drag & drop or click to scan project folder
+                        <p className="text-xs font-semibold text-zinc-350 font-mono">
+                            Import a repository folder to generate structured development context.
                         </p>
-                        <p className="mt-1.5 text-xs text-zinc-600 font-mono">
-                            Client-side only. Files never leave your local device.
+                        <p className="mt-2 text-[10.5px] text-zinc-550 font-mono">
+                            Zero-cost. Purely client-side analysis. Code never leaves your local device.
                         </p>
                     </div>
                 ) : (
                     /* Active Dashboard Views */
                     <div className="space-y-6">
                         {/* Summary statistics grid */}
-                        <div className="grid gap-3 grid-cols-2 md:grid-cols-5 text-xs font-mono">
+                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 text-xs font-mono w-full min-w-0">
                             <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
                                 <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Total Files</div>
                                 <div className="mt-1 text-sm font-bold text-zinc-200">{totalFiles}</div>
