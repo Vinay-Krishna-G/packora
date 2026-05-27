@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "@/lib/analyzer/types";
 import AIWorkflows from "./AIWorkflows";
 
@@ -25,12 +25,12 @@ export default function RepositoryInsights({
     };
 
     const archColors: Record<ArchitectureType, string> = {
-        "monorepo": "bg-cyan-950/40 text-cyan-400 border-cyan-900/50",
-        "fullstack-monolith": "bg-emerald-950/40 text-emerald-400 border-emerald-900/50",
-        "frontend-only": "bg-blue-950/40 text-blue-400 border-blue-900/50",
-        "backend-api": "bg-purple-950/40 text-purple-400 border-purple-900/50",
-        "realtime-system": "bg-rose-950/40 text-rose-400 border-rose-900/50",
-        "unknown": "bg-zinc-900 text-zinc-400 border-zinc-800"
+        "monorepo": "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+        "fullstack-monolith": "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+        "frontend-only": "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+        "backend-api": "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+        "realtime-system": "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+        "unknown": "bg-card text-muted-foreground border-border"
     };
 
     const purposeLabels: Record<RepositoryPurpose, string> = {
@@ -45,81 +45,99 @@ export default function RepositoryInsights({
     };
 
     const getReadinessColor = (score: number) => {
-        if (score >= 80) return "text-emerald-400";
-        if (score >= 50) return "text-amber-400";
-        return "text-rose-400";
+        if (score >= 80) return "text-emerald-600 dark:text-emerald-400";
+        if (score >= 50) return "text-amber-600 dark:text-amber-400";
+        return "text-rose-600 dark:text-rose-400";
     };
 
+    // Helper to evaluate soft, qualitative readiness rating
+    const readinessLabel = useMemo(() => {
+        const score = readinessScore.score;
+        if (score >= 80) return "Strong";
+        if (score >= 50) return "Moderate";
+        return "Basic";
+    }, [readinessScore.score]);
+
+    // Format compression sizes to MB/KB to prevent API credit token confusion
+    const formattedOriginalSize = useMemo(() => {
+        if (totalSize > 1024 * 1024) {
+            return `${(totalSize / 1024 / 1024).toFixed(2)} MB`;
+        }
+        return `${(totalSize / 1024).toFixed(1)} KB`;
+    }, [totalSize]);
+
     return (
-        <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-950/20 p-5">
+        <div className="mt-8 rounded-2xl border border-border bg-card/45 p-6 sm:p-7 shadow-sm transition duration-150">
             {/* 1. Header Information Area */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-900 pb-4 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4 mb-6 select-none">
                 <div>
-                    <h2 className="text-sm font-bold text-white tracking-tight">
-                        Repository Intelligence Dashboard
+                    <h2 className="text-sm font-bold text-foreground tracking-tight">
+                        Repository analysis
                     </h2>
-                    <p className="mt-0.5 text-[11px] text-zinc-500 font-mono">
-                        Handcrafted semantic stack analysis and flow maps.
+                    <p className="mt-1 text-[11px] text-muted-foreground font-mono">
+                        Structure and technology overview.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-[10px] font-mono font-semibold uppercase tracking-wider">
                     {purpose.name !== "unknown" && (
-                        <div className="rounded border border-zinc-850 bg-zinc-900/60 px-2 py-1 text-zinc-400">
+                        <div className="rounded border border-border bg-card px-2.5 py-1 text-muted-foreground shadow-sm">
                             {purposeLabels[purpose.name]}
                         </div>
                     )}
-                    <div className={`rounded border px-2 py-1 ${archColors[architecture]}`}>
+                    <div className={`rounded border px-2.5 py-1 shadow-sm ${archColors[architecture]}`}>
                         {archLabels[architecture]}
                     </div>
                 </div>
             </div>
 
-            {/* 2. Intelligence Executive Overview Card */}
-            <div className="grid gap-4 md:grid-cols-3 mb-6">
+            {/* 2. Executive Overview */}
+            <div className="grid gap-5 md:grid-cols-3 mb-6">
                 {/* Heuristic Summary text block */}
-                <div className="md:col-span-2 rounded-xl border border-zinc-900 bg-zinc-950/45 p-4 flex flex-col justify-center">
-                    <span className="text-[10px] font-bold text-zinc-550 uppercase tracking-wider font-mono mb-2">// Heuristic Executive Summary</span>
-                    <div className="text-xs text-zinc-400 leading-relaxed font-mono whitespace-pre-wrap">
-                        <span className="text-emerald-400 font-bold select-none mr-1.5">&gt;</span>{summary}
+                <div className="md:col-span-2 rounded-xl border border-border bg-card p-5 flex flex-col justify-center shadow-sm">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-mono mb-2.5">// Repository topology overview</span>
+                    <div className="text-[12px] text-foreground/90 leading-relaxed font-mono whitespace-pre-wrap">
+                        <span className="text-emerald-500 font-bold select-none mr-1.5">&gt;</span>{summary}
                     </div>
                 </div>
 
                 {/* Key Metrics block */}
-                <div className="rounded-xl border border-zinc-900 bg-zinc-950/45 p-4 flex flex-col justify-between font-mono text-xs text-zinc-400">
-                    <span className="text-[10px] font-bold text-zinc-550 uppercase tracking-wider mb-2">// Context Compression</span>
-                    <div className="flex justify-between items-center border-b border-zinc-900 pb-2 mb-2">
-                        <span>Original Files:</span>
-                        <span className="font-semibold text-zinc-200">{compression.originalFilesCount} items</span>
+                <div className="rounded-xl border border-border bg-card p-5 flex flex-col justify-between font-mono text-[11.5px] text-foreground/90 shadow-sm">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5 select-none">// Context compression</span>
+                    <div className="flex justify-between items-center border-b border-border pb-2.5 mb-2.5">
+                        <span className="text-muted-foreground">Original size:</span>
+                        <span className="font-semibold text-foreground">{formattedOriginalSize}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-zinc-900 pb-2 mb-2">
-                        <span>Context Saved:</span>
-                        <span className="font-semibold text-emerald-400">{compression.savingsPercentage.toFixed(1)}%</span>
+                    <div className="flex justify-between items-center border-b border-border pb-2.5 mb-2.5">
+                        <span className="text-muted-foreground">Context saved:</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-bold">{compression.savingsPercentage.toFixed(1)}%</span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span>Readiness Grade:</span>
-                        <span className={`font-semibold ${getReadinessColor(readinessScore.score)}`}>{readinessScore.score} / 100</span>
+                        <span className="text-muted-foreground">Readiness:</span>
+                        <span className={`font-semibold ${getReadinessColor(readinessScore.score)} font-bold`}>
+                            {readinessScore.score}/100 ({readinessLabel})
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Static Details Grid (Tech Stack vs Readiness Scorecard) */}
-            <div className="grid gap-4 md:grid-cols-2 mb-6">
-                {/* A. Heuristic Tech Stack flat list */}
-                <div className="rounded-xl border border-zinc-900 bg-zinc-950/10 p-4">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono block mb-3">// Matched Technology stack ({technologies.length})</span>
+            {/* 3. Details Grid */}
+            <div className="grid gap-5 md:grid-cols-2 mb-6">
+                {/* Technology list */}
+                <div className="rounded-xl border border-border bg-card/30 p-5 shadow-sm">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-mono block mb-3.5 select-none">// Technology stack ({technologies.length})</span>
                     {technologies.length === 0 ? (
-                        <div className="py-6 text-center text-xs text-zinc-650 font-mono">
-                            No distinct stack signatures matched in scanning.
+                        <div className="py-8 text-center text-xs text-muted-foreground font-mono select-none">
+                            No stack signatures detected.
                         </div>
                     ) : (
-                        <div className="grid gap-2.5 sm:grid-cols-2">
+                        <div className="grid gap-3 sm:grid-cols-2">
                             {technologies.map(tech => (
-                                <div key={tech.name} className="rounded-lg border border-zinc-900/60 bg-zinc-950/40 p-3 text-xs font-mono">
+                                <div key={tech.name} className="rounded-lg border border-border bg-background p-3 text-[11px] font-mono shadow-sm">
                                     <div className="flex items-center justify-between">
-                                        <span className="font-semibold text-zinc-300">{tech.name}</span>
-                                        <span className="text-zinc-600 text-[9px]">{(tech.confidence * 100).toFixed(0)}% match</span>
+                                        <span className="font-semibold text-foreground">{tech.name}</span>
+                                        <span className="text-muted-foreground text-[9px]">{(tech.confidence * 100).toFixed(0)}% match</span>
                                     </div>
-                                    <div className="mt-2 space-y-1 text-[9px] text-zinc-550 border-t border-zinc-900/60 pt-2 leading-relaxed">
+                                    <div className="mt-2 space-y-1 text-[9px] text-muted-foreground border-t border-border pt-2 leading-relaxed">
                                         {tech.explainability.matchedDependencies.length > 0 && (
                                             <div>dep: {tech.explainability.matchedDependencies.join(", ")}</div>
                                         )}
@@ -133,34 +151,34 @@ export default function RepositoryInsights({
                     )}
                 </div>
 
-                {/* B. AI Readiness Scorecard flat lists */}
-                <div className="rounded-xl border border-zinc-900 bg-zinc-950/10 p-4 font-mono text-xs">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-3">// AI Context Readiness Checklist</span>
+                {/* Scorecard */}
+                <div className="rounded-xl border border-border bg-card/30 p-5 font-mono text-xs shadow-sm">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// AI context readiness</span>
                     <div className="grid gap-4 sm:grid-cols-2">
                         {/* Score Breakdown list */}
-                        <div className="space-y-2 rounded-lg border border-zinc-900/60 bg-zinc-950/40 p-3 text-zinc-400">
-                            <span className="text-[9px] font-bold text-zinc-550 uppercase tracking-wide block border-b border-zinc-900 pb-1">Scorecard:</span>
-                            <div className="flex justify-between text-[11px]">
-                                <span>Docs Ratio:</span>
+                        <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-foreground shadow-sm">
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Metrics scorecard:</span>
+                            <div className="flex justify-between text-[11px] text-foreground/90">
+                                <span className="text-muted-foreground">Docs:</span>
                                 <span>{readinessScore.breakdown.documentation} / 20</span>
                             </div>
-                            <div className="flex justify-between text-[11px]">
-                                <span>Typing Quality:</span>
+                            <div className="flex justify-between text-[11px] text-foreground/90">
+                                <span className="text-muted-foreground">Types:</span>
                                 <span>{readinessScore.breakdown.typingQuality} / 20</span>
                             </div>
-                            <div className="flex justify-between text-[11px]">
-                                <span>Clarity Level:</span>
+                            <div className="flex justify-between text-[11px] text-foreground/90">
+                                <span className="text-muted-foreground">Clarity:</span>
                                 <span>{readinessScore.breakdown.structureClarity} / 20</span>
                             </div>
-                            <div className="flex justify-between text-[11px]">
-                                <span>Config Match:</span>
+                            <div className="flex justify-between text-[11px] text-foreground/90">
+                                <span className="text-muted-foreground">Configs:</span>
                                 <span>{readinessScore.breakdown.configCompleteness} / 20</span>
                             </div>
                         </div>
 
                         {/* Recommendations checklist */}
-                        <div className="space-y-2 rounded-lg border border-zinc-900/60 bg-zinc-950/40 p-3 text-zinc-500">
-                            <span className="text-[9px] font-bold text-zinc-550 uppercase tracking-wide block border-b border-zinc-900 pb-1">Recommendations:</span>
+                        <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-muted-foreground shadow-sm">
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Heuristic adjustments:</span>
                             {readinessScore.recommendations.slice(0, 3).map(rec => (
                                 <div key={rec} className="text-[10.5px] leading-normal flex items-start gap-1">
                                     <span className="text-amber-500 select-none">•</span>
@@ -172,25 +190,25 @@ export default function RepositoryInsights({
                 </div>
             </div>
 
-            {/* 4. Request Flow Pipelines (Phase 4) */}
+            {/* 4. Request Flow Pipelines */}
             {semanticAnalysis && semanticAnalysis.flows.length > 0 && (
-                <div className="rounded-xl border border-zinc-900 bg-zinc-950/10 p-4 mb-6 font-mono text-xs">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-3">// Semantic Request Flow pipelines</span>
+                <div className="rounded-xl border border-border bg-card/30 p-5 mb-6 font-mono text-xs shadow-sm">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// Semantic request pipelines</span>
                     <div className="space-y-3.5">
                         {semanticAnalysis.flows.map(flow => (
-                            <div key={flow.name} className="rounded-lg border border-zinc-900/60 bg-zinc-950/45 p-3">
-                                <div className="text-[10px] font-bold text-zinc-300 mb-2">// {flow.name}</div>
+                            <div key={flow.name} className="rounded-lg border border-border bg-background p-3 shadow-sm">
+                                <div className="text-[10.5px] font-bold text-foreground/90 mb-2">// {flow.name}</div>
                                 <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[10px]">
                                     {flow.steps.map((step, idx) => (
                                         <div key={step} className="flex items-center gap-1.5 py-0.5">
-                                            {idx > 0 && <span className="text-zinc-650 font-bold font-sans self-center select-none text-[8.5px]">➔</span>}
+                                            {idx > 0 && <span className="text-muted-foreground/85 font-bold font-sans self-center select-none text-[8.5px]">➔</span>}
                                             <span className={`
-                                                px-2 py-0.5 rounded border text-[9.5px] font-semibold
+                                                px-2 py-0.5 rounded border text-[9.5px] font-semibold select-none shadow-sm
                                                 ${step.includes("API endpoint") || step.startsWith("POST ") || step.startsWith("GET ")
-                                                    ? "bg-blue-950/40 text-blue-400 border-blue-900/40"
+                                                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
                                                     : step.includes("Database") || step.includes("model")
-                                                    ? "bg-purple-950/40 text-purple-400 border-purple-900/40"
-                                                    : "bg-zinc-900 border-zinc-800 text-zinc-300"
+                                                    ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                                                    : "bg-card border-border text-foreground/90"
                                                 }
                                             `}>
                                                 {step}
@@ -204,21 +222,21 @@ export default function RepositoryInsights({
                 </div>
             )}
 
-            {/* 5. Collapsible Prompts Templates (Only accordion) */}
-            <div className="rounded-xl border border-zinc-900 bg-zinc-900/5 overflow-hidden transition">
+            {/* 5. Collapsible Prompts Templates */}
+            <div className="rounded-xl border border-border bg-card/20 overflow-hidden transition shadow-sm">
                 <button
                     onClick={() => setShowWorkflows(!showWorkflows)}
-                    className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-900/10 transition text-left"
+                    className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-card/40 transition text-left cursor-pointer select-none"
                 >
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 font-mono">
-                        // 06. Suggested AI prompt templates ({prompts.length})
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
+                        // Suggested prompt templates ({prompts.length})
                     </span>
-                    <span className="text-zinc-550 transition duration-150 transform font-mono text-xs select-none">
+                    <span className="text-muted-foreground transition duration-150 transform font-mono text-xs">
                         {showWorkflows ? "Collapse [-]" : "Expand [+]"}
                     </span>
                 </button>
                 {showWorkflows && (
-                    <div className="px-4 pb-4 border-t border-zinc-900/50 pt-3">
+                    <div className="px-4 pb-4 border-t border-border/40 pt-3">
                         <AIWorkflows prompts={prompts} />
                     </div>
                 )}

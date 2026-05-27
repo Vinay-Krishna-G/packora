@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ExportMode, ExportIntent } from "@/lib/formatter/types";
+import ThemeToggle from "./ThemeToggle";
 
 type StickyToolbarProps = {
     onUploadClick: () => void;
@@ -15,6 +16,7 @@ type StickyToolbarProps = {
     setSearchQuery: (query: string) => void;
     filesCount: number;
     copied: boolean;
+    onLogoClick?: () => void;
 };
 
 export default function StickyToolbar({
@@ -31,6 +33,7 @@ export default function StickyToolbar({
     setSearchQuery,
     filesCount,
     copied,
+    onLogoClick,
 }: StickyToolbarProps) {
     const [localQuery, setLocalQuery] = useState(searchQuery);
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -49,23 +52,26 @@ export default function StickyToolbar({
     }, [searchQuery]);
 
     return (
-        <div className="sticky top-0 z-40 -mx-4 sm:-mx-8 mb-8 border-b border-zinc-900 bg-zinc-950/85 px-4 sm:px-8 py-3.5 backdrop-blur-md">
+        <div className="sticky top-0 z-40 -mx-4 sm:-mx-8 mb-8 border-b border-border bg-background/85 px-4 sm:px-8 py-3.5 backdrop-blur-md transition duration-150">
             <div className="flex flex-col gap-1">
                 {/* Primary Actions Row */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     {/* Logo & Primary Import */}
-                    <div className="flex items-center gap-4">
-                        <span className="font-mono text-xs font-bold tracking-widest text-white uppercase select-none">
+                    <div className="flex items-center gap-4 select-none">
+                        <span
+                            onClick={onLogoClick}
+                            className="font-mono text-xs font-bold tracking-widest text-foreground uppercase cursor-pointer hover:opacity-80 transition"
+                        >
                             Packora //
                         </span>
                         <button
                             onClick={onUploadClick}
-                            className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-white hover:border-zinc-700 transition"
+                            className="rounded-lg border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:border-border/80 hover:bg-muted/40 transition cursor-pointer select-none shadow-sm"
                         >
                             Import Folder
                         </button>
                         {filesCount > 0 && (
-                            <span className="text-[10px] text-zinc-500 font-mono">
+                            <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
                                 {filesCount} active files
                             </span>
                         )}
@@ -79,7 +85,7 @@ export default function StickyToolbar({
                             placeholder="Quick filter path..."
                             value={localQuery}
                             onChange={(e) => setLocalQuery(e.target.value)}
-                            className="w-full sm:w-[160px] md:w-[180px] rounded-lg border border-zinc-900 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-300 outline-none placeholder-zinc-650 focus:border-zinc-800 transition font-mono"
+                            className="w-full sm:w-[160px] md:w-[180px] rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground outline-none placeholder-muted-foreground/60 focus:border-border/80 focus:ring-1 focus:ring-border/40 transition font-mono shadow-inner"
                         />
 
                         <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
@@ -87,10 +93,10 @@ export default function StickyToolbar({
                             <button
                                 onClick={() => setShowAdvanced(!showAdvanced)}
                                 className={`
-                                    rounded-lg border px-3 py-1.5 text-xs font-bold transition flex items-center gap-1.5 font-mono shrink-0
+                                    rounded-lg border px-3 py-1.5 text-xs font-bold transition flex items-center gap-1.5 font-mono shrink-0 cursor-pointer select-none shadow-sm
                                     ${showAdvanced
-                                        ? "bg-zinc-800 border-zinc-700 text-white"
-                                        : "bg-zinc-900 border-zinc-900 text-zinc-400 hover:text-zinc-300 hover:border-zinc-800"
+                                        ? "bg-accent border-accent text-accent-foreground hover:opacity-90"
+                                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-border/80 hover:bg-muted/40"
                                     }
                                 `}
                             >
@@ -103,15 +109,17 @@ export default function StickyToolbar({
 
                             {/* Copy / Export Buttons */}
                             <div className="flex items-center gap-2">
+                                <ThemeToggle />
+                                
                                 <button
                                     type="button"
                                     onClick={onCopyClick}
                                     disabled={filesCount === 0}
                                     className={`
-                                        rounded-lg border px-3 py-1.5 text-xs font-bold transition shrink-0 font-mono
+                                        rounded-lg border px-3 py-1.5 text-xs font-bold transition shrink-0 font-mono cursor-pointer select-none shadow-sm
                                         ${copied
-                                            ? "bg-green-950/60 text-green-400 border-green-800/40"
-                                            : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700 disabled:opacity-40"
+                                            ? "bg-green-600/10 text-green-650 dark:text-green-400 border-green-600/20"
+                                            : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-border/80 hover:bg-muted/40 disabled:opacity-40 disabled:cursor-not-allowed"
                                         }
                                     `}
                                 >
@@ -122,7 +130,7 @@ export default function StickyToolbar({
                                     type="button"
                                     onClick={onPreviewClick}
                                     disabled={filesCount === 0}
-                                    className="rounded-lg border border-white bg-white px-3 py-1.5 text-xs font-bold text-black hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-white transition shrink-0 font-mono"
+                                    className="rounded-lg border border-accent bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground hover:bg-accent-hover disabled:opacity-40 disabled:hover:bg-accent disabled:cursor-not-allowed transition shrink-0 font-mono cursor-pointer select-none shadow-md"
                                 >
                                     Preview
                                 </button>
@@ -133,14 +141,14 @@ export default function StickyToolbar({
 
                 {/* Collapsible Advanced Tray */}
                 {showAdvanced && (
-                    <div className="mt-3 flex flex-wrap items-center gap-4 border-t border-zinc-900 pt-3 transition-all duration-300 animate-fadeIn">
+                    <div className="mt-3 flex flex-wrap items-center gap-4 border-t border-border pt-3 transition-all duration-300 animate-fadeIn select-none">
                         {/* Format Dropdown */}
                         <div className="flex items-center gap-1.5 text-xs font-mono">
-                            <span className="text-zinc-600 uppercase tracking-wide text-[10px]">Format:</span>
+                            <span className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Format:</span>
                             <select
                                 value={exportFormat}
                                 onChange={(e) => setExportFormat(e.target.value as "markdown" | "xml")}
-                                className="rounded bg-zinc-900 border border-zinc-800 px-2 py-1 text-zinc-300 outline-none hover:border-zinc-700 hover:text-white cursor-pointer transition"
+                                className="rounded bg-card border border-border px-2 py-1 text-foreground outline-none hover:border-border/80 cursor-pointer transition"
                             >
                                 <option value="markdown">Markdown</option>
                                 <option value="xml">Pure XML</option>
@@ -149,11 +157,11 @@ export default function StickyToolbar({
 
                         {/* Export Mode Dropdown */}
                         <div className="flex items-center gap-1.5 text-xs font-mono">
-                            <span className="text-zinc-600 uppercase tracking-wide text-[10px]">Export Mode:</span>
+                            <span className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Export mode:</span>
                             <select
                                 value={exportMode}
                                 onChange={(e) => setExportMode(e.target.value as ExportMode)}
-                                className="rounded bg-zinc-900 border border-zinc-800 px-2 py-1 text-zinc-300 outline-none hover:border-zinc-700 hover:text-white cursor-pointer transition"
+                                className="rounded bg-card border border-border px-2 py-1 text-foreground outline-none hover:border-border/80 cursor-pointer transition"
                             >
                                 <option value="full">Full (100% contents)</option>
                                 <option value="compact">Compact (No Lows)</option>
@@ -164,11 +172,11 @@ export default function StickyToolbar({
 
                         {/* Export Intent (Goal) Dropdown */}
                         <div className="flex items-center gap-1.5 text-xs font-mono">
-                            <span className="text-zinc-600 uppercase tracking-wide text-[10px]">Context Goal:</span>
+                            <span className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Context goal:</span>
                             <select
                                 value={exportIntent}
                                 onChange={(e) => setExportIntent(e.target.value as ExportIntent)}
-                                className="rounded bg-zinc-900 border border-zinc-800 px-2 py-1 text-zinc-300 outline-none hover:border-zinc-700 hover:text-white cursor-pointer transition"
+                                className="rounded bg-card border border-border px-2 py-1 text-foreground outline-none hover:border-border/80 cursor-pointer transition"
                             >
                                 <option value="general">General Overview</option>
                                 <option value="onboarding">Onboarding Guide</option>

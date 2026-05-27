@@ -9,8 +9,6 @@ import { downloadFile } from "@/lib/exporter/downloadFile";
 import { ScannedFile } from "@/lib/scanner/fileTypes";
 import { ExportMode, ExportIntent } from "@/lib/formatter/types";
 
-import { estimateTokens } from "@/lib/tokenizer/estimateTokens";
-
 import FileList from "./preview/FileList";
 import RepositoryInsights from "./preview/RepositoryInsights";
 import StickyToolbar from "./ui/StickyToolbar";
@@ -19,7 +17,11 @@ import Footer from "./ui/Footer";
 
 import { analyzeRepository } from "@/lib/analyzer/repositoryAnalyzer";
 
-export default function UploadZone() {
+type UploadZoneProps = {
+    onLogoClick?: () => void;
+};
+
+export default function UploadZone({ onLogoClick }: UploadZoneProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [ignoredCount, setIgnoredCount] = useState(0);
@@ -46,10 +48,14 @@ export default function UploadZone() {
         return analyzeRepository(files, totalFiles, ignoredCount);
     }, [files, totalFiles, ignoredCount]);
 
-    // Dynamically derive estimated tokens based on the exported content (resolves garbage count bugs)
-    const estimatedTokens = useMemo(() => {
-        if (files.length === 0) return 0;
-        return estimateTokens(exportContent);
+    // Dynamically calculate the actual context size in KB/MB to prevent token API confusion
+    const formattedExportSize = useMemo(() => {
+        if (files.length === 0 || !exportContent) return "0 KB";
+        const bytes = new Blob([exportContent]).size;
+        if (bytes > 1024 * 1024) {
+            return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+        }
+        return `${(bytes / 1024).toFixed(1)} KB`;
     }, [files, exportContent]);
 
     // Dynamically derive how many files are currently included
@@ -109,7 +115,7 @@ export default function UploadZone() {
     }
 
     return (
-        <main className="min-h-screen bg-black text-white p-4 sm:p-8">
+        <main className="min-h-screen bg-background text-foreground p-4 sm:p-8 transition duration-150 w-full overflow-x-hidden">
             <div className="mx-auto max-w-4xl w-full min-w-0">
                 {/* Sticky Toolbar Widget */}
                 <StickyToolbar
@@ -126,15 +132,16 @@ export default function UploadZone() {
                     setSearchQuery={setSearchQuery}
                     filesCount={files.length}
                     copied={copied}
+                    onLogoClick={onLogoClick}
                 />
 
                 {/* Main branding & info headers */}
-                <div className="mb-8 mt-4">
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                <div className="mb-8 mt-4 select-none">
+                    <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
                         Packora
                     </h1>
-                    <p className="mt-1 text-xs text-zinc-500 font-mono">
-                        AI-native codebase context preparation.
+                    <p className="mt-1 text-xs text-muted-foreground font-mono">
+                        Structured repository context generation for development workflows.
                     </p>
                 </div>
 
@@ -159,41 +166,41 @@ export default function UploadZone() {
                         onClick={triggerUpload}
                         className="
                             mt-8 flex cursor-pointer flex-col items-center
-                            justify-center rounded-2xl border border-zinc-900 bg-zinc-950/40 p-24 text-center
-                            transition hover:border-zinc-800 hover:bg-zinc-950 duration-200
+                            justify-center rounded-2xl border border-border bg-card p-16 sm:p-24 text-center shadow-sm select-none
+                            transition hover:border-border/80 hover:bg-muted/30 duration-200
                         "
                     >
-                        <p className="text-xs font-semibold text-zinc-350 font-mono">
+                        <p className="text-xs font-bold text-foreground font-mono">
                             Import a repository folder to generate structured development context.
                         </p>
-                        <p className="mt-2 text-[10.5px] text-zinc-550 font-mono">
+                        <p className="mt-2 text-[11px] text-muted-foreground font-sans leading-relaxed max-w-md">
                             Zero-cost. Purely client-side analysis. Code never leaves your local device.
                         </p>
                     </div>
                 ) : (
                     /* Active Dashboard Views */
-                    <div className="space-y-6">
+                    <div className="space-y-8 animate-fadeIn">
                         {/* Summary statistics grid */}
-                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 text-xs font-mono w-full min-w-0">
-                            <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Total Files</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{totalFiles}</div>
+                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-5 text-xs font-mono w-full min-w-0 select-none">
+                            <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
+                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Total files</div>
+                                <div className="mt-1 text-sm font-bold text-foreground">{totalFiles}</div>
                             </div>
-                            <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Included</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{includedCount}</div>
+                            <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
+                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Included files</div>
+                                <div className="mt-1 text-sm font-bold text-foreground">{includedCount}</div>
                             </div>
-                            <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Ignored</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{ignoredCount}</div>
+                            <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm">
+                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Ignored files</div>
+                                <div className="mt-1 text-sm font-bold text-foreground">{ignoredCount}</div>
                             </div>
-                            <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Approximate Input Size</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{estimatedTokens.toLocaleString()} tokens</div>
+                            <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm col-span-2 sm:col-span-1 md:col-span-1">
+                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Export size</div>
+                                <div className="mt-1 text-sm font-bold text-foreground truncate">{formattedExportSize}</div>
                             </div>
-                            <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Scan Time</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{processingTime}s</div>
+                            <div className="rounded-xl border border-border bg-card/45 p-3.5 shadow-sm col-span-2 sm:col-span-2 md:col-span-1">
+                                <div className="text-muted-foreground uppercase tracking-wide text-[8.5px] font-bold">Scan time</div>
+                                <div className="mt-1 text-sm font-bold text-foreground">{processingTime}s</div>
                             </div>
                         </div>
 
@@ -225,7 +232,6 @@ export default function UploadZone() {
                 includedFilesCount={includedCount}
                 ignoredFilesCount={ignoredCount + (files.length - includedCount)}
                 savingsPercentage={repositoryAnalysis.compression.savingsPercentage}
-                estimatedTokens={estimatedTokens}
                 onDownload={handleDownload}
             />
         </main>

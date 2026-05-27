@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ExportMode, ExportIntent } from "@/lib/formatter/types";
 
 type ExportPreviewModalProps = {
@@ -11,7 +11,6 @@ type ExportPreviewModalProps = {
     includedFilesCount: number;
     ignoredFilesCount: number;
     savingsPercentage: number;
-    estimatedTokens: number;
     onDownload: (customFilename: string) => void;
 };
 
@@ -25,7 +24,6 @@ export default function ExportPreviewModal({
     includedFilesCount,
     ignoredFilesCount,
     savingsPercentage,
-    estimatedTokens,
     onDownload,
 }: ExportPreviewModalProps) {
     const defaultFilename = `packora-context.${format === "markdown" ? "md" : "xml"}`;
@@ -44,7 +42,7 @@ export default function ExportPreviewModal({
         }
     };
 
-    // Calculate approximate character size in KB/MB
+    // Calculate actual generated context size in KB/MB to prevent token confusion
     const contextSizeBytes = new Blob([content]).size;
     const contextSizeFormatted = contextSizeBytes > 1024 * 1024
         ? `${(contextSizeBytes / 1024 / 1024).toFixed(2)} MB`
@@ -55,22 +53,22 @@ export default function ExportPreviewModal({
         : content;
 
     return (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-6 shadow-2xl transition duration-200 min-w-0">
+        <div className="fixed inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-5 sm:p-7 shadow-2xl transition duration-150 min-w-0 animate-fadeIn">
                 
                 {/* Header Section */}
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-4">
+                <div className="flex items-center justify-between border-b border-border pb-4 select-none">
                     <div>
-                        <h3 className="text-base font-bold text-white tracking-tight">
-                            AI Context Export Preview
+                        <h3 className="text-base font-bold text-foreground tracking-tight">
+                            Export context blueprint
                         </h3>
-                        <p className="mt-0.5 text-xs text-zinc-500 font-mono">
-                            Review optimization ratios and file headers before ingesting.
+                        <p className="mt-1 text-xs text-muted-foreground font-mono">
+                            Review structure mapping and size efficiency before downloading.
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300 transition"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground transition cursor-pointer"
                     >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -79,57 +77,57 @@ export default function ExportPreviewModal({
                 </div>
 
                 {/* Metrics Matrix */}
-                <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-                    <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Estimated AI Context Size</div>
-                        <div className="mt-1 text-sm font-semibold text-zinc-200">{contextSizeFormatted}</div>
+                <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono select-none">
+                    <div className="rounded-xl border border-border bg-background p-3.5 shadow-sm">
+                        <div className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Export size</div>
+                        <div className="mt-1 text-sm font-semibold text-foreground">{contextSizeFormatted}</div>
                     </div>
-                    <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Approximate Input Size</div>
-                        <div className="mt-1 text-sm font-semibold text-zinc-200">{estimatedTokens.toLocaleString()} tokens</div>
+                    <div className="rounded-xl border border-border bg-background p-3.5 shadow-sm">
+                        <div className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Total files</div>
+                        <div className="mt-1 text-sm font-semibold text-foreground">{includedFilesCount + ignoredFilesCount} items</div>
                     </div>
-                    <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Included / Ignored</div>
-                        <div className="mt-1 text-sm font-semibold text-zinc-200">{includedFilesCount} / {ignoredFilesCount}</div>
+                    <div className="rounded-xl border border-border bg-background p-3.5 shadow-sm">
+                        <div className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Included / Ignored</div>
+                        <div className="mt-1 text-sm font-semibold text-foreground">{includedFilesCount} / {ignoredFilesCount}</div>
                     </div>
-                    <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Compression Savings</div>
-                        <div className="mt-1 text-sm font-semibold text-emerald-400">{savingsPercentage.toFixed(1)}% Saved</div>
+                    <div className="rounded-xl border border-border bg-background p-3.5 shadow-sm">
+                        <div className="text-muted-foreground uppercase tracking-wide text-[9px] font-bold">Context saved</div>
+                        <div className="mt-1 text-sm font-semibold text-emerald-600 dark:text-emerald-400 font-extrabold">{savingsPercentage.toFixed(1)}% Saved</div>
                     </div>
                 </div>
 
                 {/* Configuration details */}
-                <div className="mt-4 flex gap-4 text-xs font-mono text-zinc-500">
-                    <div>Mode: <span className="text-zinc-300 font-semibold uppercase">{mode}</span></div>
-                    <div>Intent: <span className="text-zinc-300 font-semibold uppercase">{intent}</span></div>
-                    <div>Format: <span className="text-zinc-300 font-semibold uppercase">{format}</span></div>
+                <div className="mt-4 flex gap-4 text-xs font-mono text-muted-foreground select-none">
+                    <div>Mode: <span className="text-foreground font-semibold uppercase">{mode}</span></div>
+                    <div>Goal: <span className="text-foreground font-semibold uppercase">{intent}</span></div>
+                    <div>Format: <span className="text-foreground font-semibold uppercase">{format}</span></div>
                 </div>
 
                 {/* Filename customizer */}
-                <div className="mt-5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                        Customize Export Filename
+                <div className="mt-5 select-none">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Customize export filename
                     </label>
                     <input
                         type="text"
                         value={filename}
                         onChange={(e) => setFilename(e.target.value)}
-                        className="mt-2 w-full rounded-xl border border-zinc-900 bg-zinc-950 px-4 py-2.5 text-xs text-zinc-300 font-mono outline-none focus:border-zinc-800 transition"
+                        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs text-foreground font-mono outline-none focus:border-border/80 focus:ring-1 focus:ring-border/40 transition"
                     />
                 </div>
 
                 {/* Code Preview Section with in-snippet Quick Copier */}
                 <div className="mt-5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                        Context Blueprint Preview
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground select-none">
+                        Context blueprint preview
                     </span>
                     <div className="mt-2 relative w-full min-w-0">
-                        <div className="mt-2 h-[200px] overflow-y-auto overflow-x-hidden rounded-xl border border-zinc-900 bg-zinc-950 p-4 text-[11px] text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap select-all pr-16 break-all w-full">
+                        <div className="mt-2 h-[180px] overflow-y-auto overflow-x-hidden rounded-xl border border-border bg-background p-4 text-[11px] text-foreground/90 font-mono leading-relaxed whitespace-pre pr-16 select-all break-all w-full shadow-inner">
                             {previewSnippet}
                         </div>
                         <button
                             onClick={handleCopy}
-                            className="absolute top-2.5 right-2.5 rounded bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 px-2 py-1 text-[10px] font-semibold font-mono text-zinc-400 hover:text-zinc-200 transition"
+                            className="absolute top-2.5 right-2.5 rounded bg-card border border-border hover:border-border/80 hover:bg-background px-2 py-1 text-[10px] font-semibold font-mono text-muted-foreground hover:text-foreground transition cursor-pointer shadow-sm select-none"
                         >
                             {copied ? "Copied!" : "Copy"}
                         </button>
@@ -137,14 +135,14 @@ export default function ExportPreviewModal({
                 </div>
 
                 {/* Actions Toolbar */}
-                <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-zinc-900 pt-4">
+                <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-border pt-4">
                     <button
                         onClick={handleCopy}
                         className={`
-                            rounded-xl border px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition text-center font-mono
+                            rounded-xl border px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition text-center font-mono cursor-pointer select-none shadow-sm
                             ${copied
-                                ? "bg-green-950/60 text-green-400 border-green-800/40"
-                                : "bg-white text-black border-white hover:bg-zinc-200"
+                                ? "bg-green-600/10 text-green-650 dark:text-green-400 border-green-600/20"
+                                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-border/80 hover:bg-muted/40"
                             }
                         `}
                     >
@@ -153,7 +151,7 @@ export default function ExportPreviewModal({
                     
                     <button
                         onClick={() => onDownload(filename)}
-                        className="rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:border-zinc-700 transition text-center font-mono"
+                        className="rounded-xl border border-accent bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-accent-foreground hover:bg-accent-hover transition text-center font-mono cursor-pointer select-none shadow-md"
                     >
                         Download context
                     </button>
