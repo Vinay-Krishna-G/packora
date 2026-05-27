@@ -187,8 +187,8 @@ export default function UploadZone() {
                                 <div className="mt-1 text-sm font-bold text-zinc-200">{ignoredCount}</div>
                             </div>
                             <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
-                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">AI Context Size</div>
-                                <div className="mt-1 text-sm font-bold text-zinc-200">{estimatedTokens.toLocaleString()} tok</div>
+                                <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Approximate Input Size</div>
+                                <div className="mt-1 text-sm font-bold text-zinc-200">{estimatedTokens.toLocaleString()} tokens</div>
                             </div>
                             <div className="rounded-xl border border-zinc-900 bg-zinc-950/20 p-3">
                                 <div className="text-zinc-600 uppercase tracking-wide text-[9px]">Scan Time</div>
@@ -204,6 +204,7 @@ export default function UploadZone() {
                             files={files}
                             onToggle={toggleFile}
                             searchQuery={searchQuery}
+                            semanticAnalysis={repositoryAnalysis.semanticAnalysis}
                         />
                     </div>
                 )}

@@ -6,6 +6,7 @@ import { calculateCompression } from "./compressionAnalyzer";
 import { analyzeReadiness } from "./readinessAnalyzer";
 import { generateWorkflows } from "./workflowGenerator";
 import { detectPurpose } from "./purposeDetector";
+import { analyzeSemanticRepository } from "../summarizer";
 
 interface ParsedPackageJson {
   path: string; // File path (e.g. "packages/web/package.json")
@@ -138,6 +139,7 @@ export function analyzeRepository(
     low: files.filter(f => f.importance === "low").length,
   };
 
+  const semanticAnalysis = analyzeSemanticRepository(files);
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
   const summary = generateSummaryText(technologies, architecture, purpose.name, files.length, totalSize);
 
@@ -152,6 +154,7 @@ export function analyzeRepository(
     fileCount: files.length,
     totalSize,
     importanceStats,
+    semanticAnalysis,
   };
 }
 

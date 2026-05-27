@@ -81,19 +81,19 @@ export default function ExportPreviewModal({
                 {/* Metrics Matrix */}
                 <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
                     <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-500 uppercase tracking-wide text-[10px]">Estimated AI Context Size</div>
+                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Estimated AI Context Size</div>
                         <div className="mt-1 text-sm font-semibold text-zinc-200">{contextSizeFormatted}</div>
                     </div>
                     <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-500 uppercase tracking-wide text-[10px]">Approximate Input Size</div>
+                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Approximate Input Size</div>
                         <div className="mt-1 text-sm font-semibold text-zinc-200">{estimatedTokens.toLocaleString()} tokens</div>
                     </div>
                     <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-500 uppercase tracking-wide text-[10px]">Included / Ignored</div>
+                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Included / Ignored</div>
                         <div className="mt-1 text-sm font-semibold text-zinc-200">{includedFilesCount} / {ignoredFilesCount}</div>
                     </div>
                     <div className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-3">
-                        <div className="text-zinc-500 uppercase tracking-wide text-[10px]">Compression Savings</div>
+                        <div className="text-zinc-550 uppercase tracking-wide text-[9px] font-bold">Compression Savings</div>
                         <div className="mt-1 text-sm font-semibold text-emerald-400">{savingsPercentage.toFixed(1)}% Saved</div>
                     </div>
                 </div>
@@ -118,13 +118,21 @@ export default function ExportPreviewModal({
                     />
                 </div>
 
-                {/* Code Preview Section */}
+                {/* Code Preview Section with in-snippet Quick Copier */}
                 <div className="mt-5">
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
                         Context Blueprint Preview
                     </span>
-                    <div className="mt-2 h-[200px] overflow-auto rounded-xl border border-zinc-900 bg-zinc-950 p-4 text-[11px] text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap select-all">
-                        {previewSnippet}
+                    <div className="mt-2 relative">
+                        <div className="mt-2 h-[200px] overflow-auto rounded-xl border border-zinc-900 bg-zinc-950 p-4 text-[11px] text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap select-all pr-16">
+                            {previewSnippet}
+                        </div>
+                        <button
+                            onClick={handleCopy}
+                            className="absolute top-2.5 right-2.5 rounded bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 px-2 py-1 text-[10px] font-semibold font-mono text-zinc-400 hover:text-zinc-200 transition"
+                        >
+                            {copied ? "Copied!" : "Copy"}
+                        </button>
                     </div>
                 </div>
 
@@ -133,7 +141,7 @@ export default function ExportPreviewModal({
                     <button
                         onClick={handleCopy}
                         className={`
-                            rounded-xl border px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition text-center
+                            rounded-xl border px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition text-center font-mono
                             ${copied
                                 ? "bg-green-950/60 text-green-400 border-green-800/40"
                                 : "bg-white text-black border-white hover:bg-zinc-200"
@@ -145,7 +153,7 @@ export default function ExportPreviewModal({
                     
                     <button
                         onClick={() => onDownload(filename)}
-                        className="rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:border-zinc-700 transition text-center"
+                        className="rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:border-zinc-700 transition text-center font-mono"
                     >
                         Download context
                     </button>

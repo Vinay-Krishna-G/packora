@@ -1,3 +1,5 @@
+import { SemanticRepositoryAnalysis } from "../summarizer/types";
+
 export type ArchitectureType =
   | "monorepo"
   | "fullstack-monolith"
@@ -84,6 +86,7 @@ export interface ProjectAnalysis {
     normal: number;
     low: number;
   };
+  semanticAnalysis?: SemanticRepositoryAnalysis;
 }
 
 export interface HeuristicRule {

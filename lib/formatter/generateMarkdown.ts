@@ -41,6 +41,22 @@ export function generateMarkdown(
         );
     }
 
+    if (mode === "debug") {
+        // Debug mode filters to configs, environments, typings, tests, and critical entrypoints
+        filteredFiles = filteredFiles.filter(
+            (f) =>
+                f.importance === "critical" ||
+                f.importance === "low" ||
+                f.name.endsWith(".d.ts") ||
+                f.name.includes("config") ||
+                f.name.startsWith(".env") ||
+                f.name.includes("setup") ||
+                f.path.includes("test") ||
+                f.path.includes("spec") ||
+                f.path.includes("__tests__")
+        );
+    }
+
     const prioritizedFiles = sortFiles(filteredFiles);
     const includedCount = filteredFiles.length;
 
@@ -72,7 +88,7 @@ export function generateMarkdown(
         "general": "Provide a comprehensive code synthesis and general structural walkthrough.",
         "debugging": "PRIORITY DIRECTIVE: Focus intensely on tracing runtime exceptions, boundary conditions, typing declarations, linter configurations, and environmental setups.",
         "onboarding": "PRIORITY DIRECTIVE: Primed for fast software onboarding. Structure responses around high-level architecture maps, topological flows, and setup triggers.",
-        "refactoring": "PRIORITY DIRECTIVE: Audit codebase for SOLID design principles, locate design anti-patterns, highlight tight-coupling, and provide modular refactoring mockups.",
+        "architecture": "PRIORITY DIRECTIVE: Evaluate architectural structural boundaries, tight-coupling issues, database schemas alignment, and design patterns consistency.",
         "security": "PRIORITY DIRECTIVE: Evaluate third-party dependencies package licenses, environment configurations safety, input validation layers, and security-risk variables."
     };
 
@@ -103,6 +119,37 @@ export function generateMarkdown(
             xml += `      <workflow type="${prompt.title.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-")}" />\n`;
         }
         xml += `    </recommended_workflows>\n`;
+
+        // Semantic analysis injections
+        if (analysis.semanticAnalysis) {
+            const sem = analysis.semanticAnalysis;
+            if (sem.entrypoints.length > 0) {
+                xml += `    <entrypoints>\n`;
+                for (const ep of sem.entrypoints) {
+                    xml += `      <entrypoint path="${ep.path}" type="${ep.entrypointType || 'general'}" summary="${ep.summary}" />\n`;
+                }
+                xml += `    </entrypoints>\n`;
+            }
+            if (sem.routes.length > 0) {
+                xml += `    <routes>\n`;
+                for (const r of sem.routes) {
+                    xml += `      <route path="${r.path}" method="${r.method}" handler="${r.handlerFile}" />\n`;
+                }
+                xml += `    </routes>\n`;
+            }
+            if (sem.flows.length > 0) {
+                xml += `    <flows>\n`;
+                for (const f of sem.flows) {
+                    xml += `      <flow name="${f.name}">\n`;
+                    for (const step of f.steps) {
+                        xml += `        <step>${step}</step>\n`;
+                    }
+                    xml += `      </flow>\n`;
+                }
+                xml += `    </flows>\n`;
+            }
+        }
+
         xml += `  </repository_analysis>\n\n`;
 
         xml += `  <metadata>\n`;
@@ -114,17 +161,34 @@ export function generateMarkdown(
 
         // Add Directory Structure Tree
         xml += `  <directory_structure>\n`;
+        const dirRegistered = new Set<string>();
         for (const file of prioritizedFiles) {
-            const desc = getSemanticFileDescription(file.path, file.name);
-            xml += `    <item path="${file.path}" type="${file.type}" importance="${file.importance}" desc="${desc}" size="${file.size}" />\n`;
+            if (analysis.semanticAnalysis) {
+                const parts = file.path.split("/");
+                parts.pop();
+                let currentPath = "";
+                for (const part of parts) {
+                    currentPath = currentPath ? `${currentPath}/${part}` : part;
+                    if (!dirRegistered.has(currentPath)) {
+                        dirRegistered.add(currentPath);
+                        const dirSem = analysis.semanticAnalysis.directorySummaries[currentPath];
+                        const dirSummary = dirSem ? dirSem.summary : "Directory subfolder";
+                        xml += `    <directory path="${currentPath}" summary="${dirSummary}" />\n`;
+                    }
+                }
+            }
+            const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+            const desc = sem?.summary || getSemanticFileDescription(file.path, file.name);
+            xml += `    <item path="${file.path}" type="${file.type}" importance="${file.importance}" desc="${desc}" size="${file.size}" is_entrypoint="${sem?.isEntrypoint ? 'true' : 'false'}" />\n`;
         }
         xml += `  </directory_structure>\n\n`;
 
         xml += `  <files>\n`;
-        // Architecture mode excludes file contents dumps entirely!
         if (mode !== "architecture") {
             for (const file of prioritizedFiles) {
-                xml += `    <file path="${file.path}" type="${file.type}" importance="${file.importance}">\n`;
+                const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+                const summaryVal = sem?.summary || getSemanticFileDescription(file.path, file.name);
+                xml += `    <file path="${file.path}" type="${file.type}" importance="${file.importance}" summary="${summaryVal}" is_entrypoint="${sem?.isEntrypoint ? 'true' : 'false'}">\n`;
                 if (file.type === "text") {
                     xml += `      <![CDATA[\n${file.content}\n]]>\n`;
                 } else if (file.type === "binary") {
@@ -135,7 +199,13 @@ export function generateMarkdown(
                 xml += `    </file>\n`;
             }
         } else {
-            xml += `    <!-- File body loads omitted due to Architecture Export Mode selection -->\n`;
+            for (const file of prioritizedFiles) {
+                const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+                const summaryVal = sem?.summary || getSemanticFileDescription(file.path, file.name);
+                xml += `    <file path="${file.path}" type="${file.type}" importance="${file.importance}" summary="${summaryVal}" is_entrypoint="${sem?.isEntrypoint ? 'true' : 'false'}">\n`;
+                xml += `      <!-- File content body omitted in Architecture Mode. Purpose: ${summaryVal} -->\n`;
+                xml += `    </file>\n`;
+            }
         }
         xml += `  </files>\n`;
         xml += `</repository>\n`;
@@ -171,15 +241,60 @@ export function generateMarkdown(
         const wfKey = prompt.title.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
         markdown += `<recommended_workflow type="${wfKey}" />\n`;
     }
+
+    // Semantic analysis navigation mapping
+    if (analysis.semanticAnalysis) {
+        const sem = analysis.semanticAnalysis;
+        markdown += `\n## Navigation & Architecture Map\n`;
+        if (sem.entrypoints.length > 0) {
+            markdown += `### System Entrypoints\n`;
+            for (const ep of sem.entrypoints) {
+                markdown += `- **${ep.path}** [${ep.entrypointType || 'entrypoint'}] - ${ep.summary}\n`;
+            }
+            markdown += `\n`;
+        }
+        if (sem.routes.length > 0) {
+            markdown += `### API Routing\n`;
+            for (const r of sem.routes) {
+                markdown += `- **${r.method} ${r.path}** -> Handled by \`${r.handlerFile.split('/').pop()}\`\n`;
+            }
+            markdown += `\n`;
+        }
+        if (sem.flows.length > 0) {
+            markdown += `### Semantic Data Flows\n`;
+            for (const f of sem.flows) {
+                markdown += `- **${f.name}**: ${f.steps.join(" ➔ ")}\n`;
+            }
+            markdown += `\n`;
+        }
+    }
+
     markdown += `</repository_analysis>\n\n`;
 
     // Add Directory Structure Tree in Markdown with semantic descriptors
     markdown += `## Directory Structure\n\n\`\`\`text\n`;
+    const dirRegisteredMd = new Set<string>();
     for (const file of prioritizedFiles) {
+        if (analysis.semanticAnalysis) {
+            const parts = file.path.split("/");
+            parts.pop();
+            let currentPath = "";
+            for (const part of parts) {
+                currentPath = currentPath ? `${currentPath}/${part}` : part;
+                if (!dirRegisteredMd.has(currentPath)) {
+                    dirRegisteredMd.add(currentPath);
+                    const dirSem = analysis.semanticAnalysis.directorySummaries[currentPath];
+                    const dirSummary = dirSem ? dirSem.summary : "Directory subfolder";
+                    markdown += `/${currentPath} - ${dirSummary}\n`;
+                }
+            }
+        }
         const typeStr = file.type === "text" ? "" : ` [${file.type}]`;
         const importanceStr = file.importance === "normal" ? "" : ` [${file.importance}]`;
-        const desc = getSemanticFileDescription(file.path, file.name);
-        markdown += `${file.path}${typeStr}${importanceStr} (${(file.size / 1024).toFixed(1)} KB) - ${desc}\n`;
+        
+        const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+        const desc = sem?.summary || getSemanticFileDescription(file.path, file.name);
+        markdown += `  ├── ${file.path}${typeStr}${importanceStr} (${(file.size / 1024).toFixed(1)} KB) - ${desc}\n`;
     }
     markdown += `\`\`\`\n\n`;
 
@@ -187,8 +302,10 @@ export function generateMarkdown(
     markdown += `## Repository Files\n\n`;
     if (mode !== "architecture") {
         for (const file of prioritizedFiles) {
+            const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+            const summaryVal = sem?.summary || getSemanticFileDescription(file.path, file.name);
             markdown += `### File: ${file.path}\n`;
-            markdown += `<file path="${file.path}" type="${file.type}" importance="${file.importance}">\n\n`;
+            markdown += `<file path="${file.path}" type="${file.type}" importance="${file.importance}" summary="${summaryVal}" is_entrypoint="${sem?.isEntrypoint ? 'true' : 'false'}">\n\n`;
 
             if (file.type === "text") {
                 markdown += "```" + file.extension + "\n";
@@ -203,7 +320,14 @@ export function generateMarkdown(
             markdown += `\n</file>\n\n`;
         }
     } else {
-        markdown += `*File contents body loads omitted due to Architecture Export Mode selection. High-level semantic directory structure mapped above.*\n`;
+        for (const file of prioritizedFiles) {
+            const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
+            const summaryVal = sem?.summary || getSemanticFileDescription(file.path, file.name);
+            markdown += `### File: ${file.path}\n`;
+            markdown += `<file path="${file.path}" type="${file.type}" importance="${file.importance}" summary="${summaryVal}" is_entrypoint="${sem?.isEntrypoint ? 'true' : 'false'}">\n\n`;
+            markdown += `*File content body omitted in Architecture Mode. Purpose: ${summaryVal}*\n\n`;
+            markdown += `</file>\n\n`;
+        }
     }
 
     return markdown;
