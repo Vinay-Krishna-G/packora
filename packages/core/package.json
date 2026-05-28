@@ -1,5 +1,5 @@
 {
-  "name": "@codemelt/core",
+  "name": "codemelt-core",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "minimatch": "^10.2.5",
-    "@codemelt/shared": "^0.1.0"
+    "codemelt-shared": "^0.1.0"
   },
   "engines": {
     "node": ">=18"

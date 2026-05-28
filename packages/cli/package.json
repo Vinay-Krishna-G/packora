@@ -1,5 +1,5 @@
 {
-  "name": "@codemelt",
+  "name": "codemelt",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -27,7 +27,7 @@
     "commander": "^12.1.0",
     "fs-extra": "^11.2.0",
     "ora": "^8.0.1",
-    "@codemelt/core": "^0.1.0",
+    "codemelt-core": "^0.1.0",
     "@codemelt/shared": "^0.1.0"
   },
   "devDependencies": {
