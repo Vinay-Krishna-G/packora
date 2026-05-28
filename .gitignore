@@ -1,8 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -11,20 +11,24 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
-# production
-/build
+# production & compilation
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
 
 # misc
 .DS_Store
 *.pem
+*.tgz
 
-# debug
+# debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -34,8 +38,10 @@ yarn-error.log*
 .env*
 
 # vercel
-.vercel
+.vercel/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# CodeMelt generated contexts
+codemelt-context.md
+codemelt-context.xml
+codemelt-context.*
+

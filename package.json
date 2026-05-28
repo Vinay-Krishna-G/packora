@@ -1,29 +1,40 @@
 {
-  "name": "packora",
-  "version": "0.1.0",
+  "name": "codemelt",
   "private": true,
+  "license": "MIT",
+  "description": "Repository intelligence and structured context exports for modern codebases.",
+  "keywords": [
+    "repository",
+    "intelligence",
+    "context",
+    "optimization",
+    "llm",
+    "ai",
+    "context-window",
+    "cli"
+  ],
+  "homepage": "https://github.com/Vinay-Krishna-G/codemelt#readme",
+  "bugs": {
+    "url": "https://github.com/Vinay-Krishna-G/codemelt/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vinay-Krishna-G/codemelt.git"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "clean": "rm -rf packages/*/dist apps/web/.next packages/*/*.tsbuildinfo tsconfig.tsbuildinfo",
+    "clean:full": "rm -rf node_modules packages/*/dist apps/web/.next packages/*/*.tsbuildinfo tsconfig.tsbuildinfo",
+    "dev": "npm run dev --workspace=codemelt-web",
+    "build": "npm run build --workspace=@codemelt/shared && npm run build --workspace=@codemelt/core && npm run build --workspace=@codemelt/cli && npm run build --workspace=codemelt-web",
+    "typecheck": "tsc -b",
+    "test": "npx tsx --test packages/core/tests/*.ts",
+    "lint": "npm run lint --workspace=codemelt-web"
   },
-  "dependencies": {
-    "minimatch": "^10.2.5",
-    "next": "16.2.6",
-    "next-themes": "^0.4.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-dropzone": "^15.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
   }
 }

@@ -1,0 +1,8 @@
+src
+tests
+coverage
+.next
+exports
+*.log
+*.tgz
+node_modules
