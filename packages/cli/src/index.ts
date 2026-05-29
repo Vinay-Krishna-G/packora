@@ -47,7 +47,7 @@ async function getFilesRecursively(
 
   for (let offset = 0; offset < list.length; offset += BATCH_SIZE) {
     const batch = list.slice(offset, offset + BATCH_SIZE);
-    const batchResults = await Promise.all(batch.map(async (file) => {
+    const batchResults = await Promise.all(batch.map(async (file: string) => {
       const absolutePath = path.join(dir, file);
       const relativePath = path.relative(baseDir, absolutePath);
 
@@ -158,7 +158,7 @@ program
   .option("-m, --mode <mode>", "Extraction mode details (tiny, standard, deep, maximum)", "standard")
   .option("-i, --intent <intent>", "Context goals intention (general, debugging, onboarding, architecture, security)", "general")
   .option("-o, --output <output>", "Custom context export destination filename")
-  .action(async (directory, options) => {
+  .action(async (directory: string | undefined, options: any) => {
     const targetDir = directory ? path.resolve(directory) : process.cwd();
     
     if (!(await fs.pathExists(targetDir))) {
