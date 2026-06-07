@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { PurposeResult, RepositoryPurpose } from "./types.js";
 
 export function detectPurpose(

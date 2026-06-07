@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "@codemelt/core";
+import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "codemelt-core";
 import AIWorkflows from "./AIWorkflows";
 
 type RepositoryInsightsProps = {
@@ -64,10 +64,10 @@ export default function RepositoryInsights({
     const metrics = useMemo(() => {
         const rawOriginal = compression.originalBytes; // Total bytes in repo (included + ignored)
         const exportBytes = exportSizeBytes ?? compression.compressedBytes;
-        
+
         // Guarantee originalSize >= exportSize
         const originalBytes = Math.max(rawOriginal, exportBytes);
-        
+
         // Calculate consistent compression savings percentage
         const savingsPercentage = originalBytes > 0
             ? Math.max(0, Math.min(99.9, ((originalBytes - exportBytes) / originalBytes) * 100))
@@ -227,8 +227,8 @@ export default function RepositoryInsights({
                                                 ${step.includes("API endpoint") || step.startsWith("POST ") || step.startsWith("GET ")
                                                     ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
                                                     : step.includes("Database") || step.includes("model")
-                                                    ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
-                                                    : "bg-card border-border text-foreground/90"
+                                                        ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                                                        : "bg-card border-border text-foreground/90"
                                                 }
                                             `}>
                                                 {step}

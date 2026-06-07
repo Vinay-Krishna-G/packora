@@ -1,4 +1,4 @@
-import { ScannedFile, ExportMode, ExportIntent } from "@codemelt/shared";
+import { ScannedFile, ExportMode, ExportIntent } from "codemelt-shared";
 import { sortFiles } from "../prioritizer/sortFiles.js";
 import { analyzeRepository } from "../analyzer/repositoryAnalyzer.js";
 
@@ -95,7 +95,7 @@ export function* generateRepositoryContextChunks(
     if (format === "xml") {
         yield `<?xml version="1.0" encoding="UTF-8"?>\n`;
         yield `<repository>\n`;
-        
+
         let xmlHeader = `  <repository_analysis>\n`;
         xmlHeader += `    <architecture>${analysis.architecture}</architecture>\n`;
         xmlHeader += `    <architecture_label>${archLabels[analysis.architecture]}</architecture_label>\n`;
@@ -106,7 +106,7 @@ export function* generateRepositoryContextChunks(
             xmlHeader += `    <compression_savings>${analysis.compression.savingsPercentage.toFixed(1)}%</compression_savings>\n`;
         }
         xmlHeader += `    <intent_directive>${intentDirectives[intent]}</intent_directive>\n`;
-        
+
         // Compact list of technologies
         xmlHeader += `    <technologies>\n`;
         for (const tech of analysis.technologies) {
@@ -233,7 +233,7 @@ export function* generateRepositoryContextChunks(
         }
     }
     yield mdTech;
-    
+
     // Compact list of suggested workflows
     let mdWorkflows = `\n## Recommended Workflow Invocations\n`;
     for (const prompt of analysis.prompts) {
@@ -292,7 +292,7 @@ export function* generateRepositoryContextChunks(
         }
         const typeStr = file.type === "text" ? "" : ` [${file.type}]`;
         const importanceStr = file.importance === "normal" ? "" : ` [${file.importance}]`;
-        
+
         const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
         const desc = sem?.summary || getSemanticFileDescription(file.path, file.name);
         mdDir += `  ├── ${file.path}${typeStr}${importanceStr} (${(file.size / 1024).toFixed(1)} KB) - ${desc}\n`;

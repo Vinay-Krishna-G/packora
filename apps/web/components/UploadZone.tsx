@@ -2,10 +2,10 @@
 
 import { useState, useMemo, useRef } from "react";
 
-import { scanFiles, generateRepositoryContext, analyzeRepository } from "@codemelt/core";
+import { scanFiles, generateRepositoryContext, analyzeRepository } from "codemelt-core";
 import { downloadFile } from "../lib/exporter/downloadFile";
 
-import { ScannedFile, ExportMode, ExportIntent, RawFile } from "@codemelt/shared";
+import { ScannedFile, ExportMode, ExportIntent, RawFile } from "codemelt-shared";
 
 import FileList from "./preview/FileList";
 import RepositoryInsights from "./preview/RepositoryInsights";
@@ -24,7 +24,7 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
     const [totalFiles, setTotalFiles] = useState(0);
     const [processingTime, setProcessingTime] = useState(0);
     const [files, setFiles] = useState<ScannedFile[]>([]);
-    
+
     // Configurations state
     const [exportFormat, setExportFormat] = useState<"markdown" | "xml">("markdown");
     const [exportMode, setExportMode] = useState<ExportMode>("standard");
@@ -176,7 +176,7 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
 
                 {files.length === 0 ? (
                     /* Clean Empty State */
-                    <div 
+                    <div
                         onClick={triggerUpload}
                         className="
                             mt-8 flex cursor-pointer flex-col items-center
@@ -230,7 +230,7 @@ export default function UploadZone({ onLogoClick }: UploadZoneProps) {
                         />
                     </div>
                 )}
-                
+
                 {/* Reusable premium developer tool footer */}
                 <Footer />
             </div>

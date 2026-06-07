@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { scoreFile } from "./scoreFile.js";
 
 export function sortFiles(

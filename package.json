@@ -25,7 +25,7 @@
     "clean": "rm -rf packages/*/dist apps/web/.next packages/*/*.tsbuildinfo tsconfig.tsbuildinfo",
     "clean:full": "rm -rf node_modules packages/*/dist apps/web/.next packages/*/*.tsbuildinfo tsconfig.tsbuildinfo",
     "dev": "npm run dev --workspace=codemelt-web",
-    "build": "npm run build --workspace=@codemelt/shared && npm run build --workspace=@codemelt/core && npm run build --workspace=codemelt && npm run build --workspace=codemelt-web",
+    "build": "npm run build --workspace=codemelt-shared && npm run build --workspace=codemelt-core && npm run build --workspace=codemelt && npm run build --workspace=codemelt-web",
     "typecheck": "tsc -b",
     "test": "npx tsx --test packages/core/tests/*.ts",
     "lint": "npm run lint --workspace=codemelt-web"

@@ -1,4 +1,4 @@
-import { ScannedFile, ExportMode, ExportIntent } from "@codemelt/shared";
+import { ScannedFile, ExportMode, ExportIntent } from "codemelt-shared";
 import { SemanticRepositoryAnalysis } from "../summarizer/types.js";
 
 export type ArchitectureType =

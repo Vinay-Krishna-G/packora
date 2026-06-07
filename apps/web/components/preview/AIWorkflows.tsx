@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AIWorkflowPrompt } from "@codemelt/core";
+import { AIWorkflowPrompt } from "codemelt-core";
 
 type AIWorkflowsProps = {
     prompts: AIWorkflowPrompt[];
@@ -29,7 +29,7 @@ export default function AIWorkflows({
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 select-none">
                 Adaptive workflows
             </h3>
-            
+
             <div className="space-y-4">
                 {prompts.map((prompt, index) => (
                     <div

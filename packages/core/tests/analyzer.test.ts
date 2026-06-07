@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert";
 import { analyzeRepository } from "../src/analyzer/repositoryAnalyzer.js";
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 
 test("Repository Analyzer validation", async (t) => {
     await t.test("should identify Next.js and React signatures", () => {
@@ -34,12 +34,12 @@ test("Repository Analyzer validation", async (t) => {
         ];
 
         const analysis = analyzeRepository(dummyFiles);
-        
+
         assert.strictEqual(analysis.architecture, "frontend-only");
-        
+
         const hasNext = analysis.technologies.some(tech => tech.name === "Next.js");
         const hasReact = analysis.technologies.some(tech => tech.name === "React");
-        
+
         assert.strictEqual(hasNext, true);
         assert.strictEqual(hasReact, true);
     });

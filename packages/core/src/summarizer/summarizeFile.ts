@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { FileSemanticSummary } from "./types.js";
 import { extractPatterns } from "./extractPatterns.js";
 import { inferPurpose } from "./inferPurpose.js";
@@ -24,7 +24,7 @@ export function summarizeFile(file: ScannedFile): FileSemanticSummary {
     const parts = file.path.split("app/api/");
     if (parts.length > 1) {
       const endpoint = "/api/" + parts[1].replace(/\/route\.(ts|js)$/, "");
-      
+
       // Map exported methods
       const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
       for (const m of methods) {
@@ -32,7 +32,7 @@ export function summarizeFile(file: ScannedFile): FileSemanticSummary {
           routeStrings.push(`${m} ${endpoint}`);
         }
       }
-      
+
       // If no explicit method exports were caught, register standard GET/POST
       if (routeStrings.length === 0) {
         routeStrings.push(`ALL ${endpoint}`);

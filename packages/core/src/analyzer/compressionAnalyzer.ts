@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { CompressionStats } from "./types.js";
 
 export function calculateCompression(
@@ -8,7 +8,7 @@ export function calculateCompression(
   ignoredBytes: number = 0
 ): CompressionStats {
   const originalFilesCount = totalFilesCount;
-  
+
   // Filters active included files
   const includedFiles = files.filter((f) => f.included);
   const compressedFilesCount = includedFiles.length;

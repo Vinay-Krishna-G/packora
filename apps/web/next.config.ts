@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   transpilePackages: [
-    "@codemelt/core",
-    "@codemelt/shared"
+    "codemelt-core",
+    "codemelt-shared"
   ]
 };
 

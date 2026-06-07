@@ -1,4 +1,4 @@
-import { RawFile, ScannedFile, ScanResult, normalizePath, MAX_EXPORT_FILES, MAX_FILE_SIZE, MAX_CONTENT_CHARS, MAX_EXPORT_BYTES } from "@codemelt/shared";
+import { RawFile, ScannedFile, ScanResult, normalizePath, MAX_EXPORT_FILES, MAX_FILE_SIZE, MAX_CONTENT_CHARS, MAX_EXPORT_BYTES } from "codemelt-shared";
 import { shouldIgnore } from "../filters/shouldIgnore.js";
 import { detectImportance } from "./importanceDetector.js";
 
@@ -35,8 +35,8 @@ export async function scanFiles(
     // Capping maximum number of files to index to protect memory
     let eligibleFilesList = normalizedFiles;
     if (eligibleFilesList.length > MAX_EXPORT_FILES) {
-      console.warn(`[CodeMelt] Safety boundary cap hit: repository contains ${eligibleFilesList.length} files. Restricting active index depth to ${MAX_EXPORT_FILES} items.`);
-      eligibleFilesList = eligibleFilesList.slice(0, MAX_EXPORT_FILES);
+        console.warn(`[CodeMelt] Safety boundary cap hit: repository contains ${eligibleFilesList.length} files. Restricting active index depth to ${MAX_EXPORT_FILES} items.`);
+        eligibleFilesList = eligibleFilesList.slice(0, MAX_EXPORT_FILES);
     }
 
     // Single-pass deterministic ignore and size tracking
@@ -99,7 +99,7 @@ export async function scanFiles(
                     try {
                         const rawText = await file.text();
                         totalBytesAccumulator += size;
-                        
+
                         // Safe content length characters truncation cap
                         if (rawText.length > MAX_CONTENT_CHARS) {
                             content = rawText.slice(0, MAX_CONTENT_CHARS) + "\n\n[Content truncated by CodeMelt due to size safety thresholds]";

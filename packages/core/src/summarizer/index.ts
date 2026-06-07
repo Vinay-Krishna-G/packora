@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { SemanticRepositoryAnalysis, FileSemanticSummary } from "./types.js";
 import { summarizeFile } from "./summarizeFile.js";
 import { summarizeDirectory } from "./summarizeDirectory.js";

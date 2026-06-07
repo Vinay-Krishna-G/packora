@@ -1,5 +1,5 @@
 import { minimatch } from "minimatch";
-import { DEFAULT_IGNORES, normalizePath } from "@codemelt/shared";
+import { DEFAULT_IGNORES, normalizePath } from "codemelt-shared";
 
 export function shouldIgnore(path: string, customRules?: string[]): boolean {
     const rules = customRules || DEFAULT_IGNORES;

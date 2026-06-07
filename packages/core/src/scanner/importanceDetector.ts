@@ -1,4 +1,4 @@
-import { FileImportance, normalizePath } from "@codemelt/shared";
+import { FileImportance, normalizePath } from "codemelt-shared";
 
 export function detectImportance(
   path: string,

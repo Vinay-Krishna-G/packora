@@ -1,4 +1,4 @@
-import { FileImportance } from "@codemelt/shared";
+import { FileImportance } from "codemelt-shared";
 
 export type EntrypointType = "server" | "frontend" | "app-shell" | "router-root" | "layout-root";
 

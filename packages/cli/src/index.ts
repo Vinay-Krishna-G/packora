@@ -6,8 +6,8 @@ import ora from "ora";
 import fs from "fs-extra";
 import path from "path";
 import { performance } from "node:perf_hooks";
-import { scanFiles, generateRepositoryContext, shouldIgnore } from "@codemelt/core";
-import { DEFAULT_IGNORES, ExportMode, ExportIntent, MAX_DIRECTORY_DEPTH } from "@codemelt/shared";
+import { scanFiles, generateRepositoryContext, shouldIgnore } from "codemelt-core";
+import { DEFAULT_IGNORES, ExportMode, ExportIntent, MAX_DIRECTORY_DEPTH } from "codemelt-shared";
 
 const majorNodeVersion = parseInt(process.versions.node.split(".")[0], 10);
 if (majorNodeVersion < 18) {
@@ -101,7 +101,7 @@ program
   .description("Initialize a custom .codemeltignore file with standard dev-tooling defaults.")
   .action(async () => {
     const ignorePath = path.join(process.cwd(), ".codemeltignore");
-    
+
     if (await fs.pathExists(ignorePath)) {
       console.log(chalk.yellow("ℹ .codemeltignore already exists in this folder."));
       return;
@@ -160,7 +160,7 @@ program
   .option("-o, --output <output>", "Custom context export destination filename")
   .action(async (directory: string | undefined, options: any) => {
     const targetDir = directory ? path.resolve(directory) : process.cwd();
-    
+
     if (!(await fs.pathExists(targetDir))) {
       console.error(chalk.red(`Error: Target directory '${targetDir}' does not exist.`));
       process.exit(1);
@@ -212,7 +212,7 @@ program
 
       // 2. Scan and traverse files recursively with early path exclusions
       const rawFiles = await getFilesRecursively(targetDir, targetDir, ignoreRules);
-      
+
       const totalBytes = rawFiles.reduce((acc, f) => acc + f.size, 0);
       if (rawFiles.length > 500 || totalBytes > 10 * 1024 * 1024) {
         spinner.stop();

@@ -1,6 +1,6 @@
-import { ScannedFile, FileImportance, FileType } from "@codemelt/shared";
+import { ScannedFile, FileImportance, FileType } from "codemelt-shared";
 import { useState, useMemo } from "react";
-import { SemanticRepositoryAnalysis } from "@codemelt/core";
+import { SemanticRepositoryAnalysis } from "codemelt-core";
 
 type FileListProps = {
     files: ScannedFile[];
@@ -112,7 +112,7 @@ export default function FileList({
                 <h3 className="text-sm font-bold text-foreground tracking-tight">
                     Repository files ({processedFiles.length})
                 </h3>
-                
+
                 {/* Filters Row */}
                 <div className="flex flex-wrap items-center gap-3.5 text-[11px] font-mono">
                     {/* Status filter */}
@@ -185,7 +185,7 @@ export default function FileList({
                     processedFiles.map((file) => {
                         // Resolve semantic annotations from analysis map
                         const sem = semanticAnalysis?.fileSummaries[file.path];
-                        
+
                         // Parse folder structures for hover aggregates
                         const pathParts = file.path.split("/");
                         pathParts.pop(); // remove file name
@@ -239,7 +239,7 @@ export default function FileList({
                                                     Oversized (&gt;1MB)
                                                 </span>
                                             )}
-                                            
+
                                             <span className="text-[10.5px] text-muted-foreground font-mono shrink-0 select-none">
                                                 ({(file.size / 1024).toFixed(1)} KB)
                                             </span>

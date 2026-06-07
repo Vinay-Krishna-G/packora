@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ExportMode, ExportIntent } from "@codemelt/shared";
+import { ExportMode, ExportIntent } from "codemelt-shared";
 import ThemeToggle from "./ThemeToggle";
 
 type StickyToolbarProps = {
@@ -112,7 +112,7 @@ export default function StickyToolbar({
                             {/* Copy / Download / Preview Buttons (Download as primary, Copy/Preview as secondary) */}
                             <div className="flex items-center gap-2">
                                 <ThemeToggle />
-                                
+
                                 <button
                                     type="button"
                                     onClick={onCopyClick}
@@ -136,7 +136,7 @@ export default function StickyToolbar({
                                 >
                                     Preview
                                 </button>
-                                
+
                                 <button
                                     type="button"
                                     onClick={onDownloadClick}

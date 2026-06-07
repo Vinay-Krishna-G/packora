@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ExportMode, ExportIntent } from "@codemelt/shared";
+import { ExportMode, ExportIntent } from "codemelt-shared";
 
 type ExportPreviewModalProps = {
     isOpen: boolean;
@@ -55,7 +55,7 @@ export default function ExportPreviewModal({
     return (
         <div className="fixed inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-5 sm:p-7 shadow-2xl transition duration-150 min-w-0 animate-fadeIn">
-                
+
                 {/* Header Section */}
                 <div className="flex items-center justify-between border-b border-border pb-4 select-none">
                     <div>
@@ -148,7 +148,7 @@ export default function ExportPreviewModal({
                     >
                         {copied ? "Copied to Clipboard!" : "Copy Full Context"}
                     </button>
-                    
+
                     <button
                         onClick={() => onDownload(filename)}
                         className="rounded-xl border border-accent bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-accent-foreground hover:bg-accent-hover transition text-center font-mono cursor-pointer select-none shadow-md"

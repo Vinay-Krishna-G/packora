@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { TECHNOLOGY_RULES } from "./rules.js";
 import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "./types.js";
 
@@ -107,7 +107,7 @@ export function analyzeRepository(
     // If we have any active matches, register the detection
     if (score > 0) {
       const finalScore = Math.min(score, 1.0); // Cap at 1.0 (absolute confidence)
-      
+
       detections.set(rule.name, {
         name: rule.name,
         category: rule.category,
@@ -126,14 +126,14 @@ export function analyzeRepository(
   // 3. Sub-modules Orchestration
   const technologies = Array.from(detections.values());
   const architecture = detectArchitecture(files, parsedPackages, detections);
-  
+
   // Extract parsed dependencies set for purpose detection
   const dependenciesSet = new Set<string>();
   for (const pkg of parsedPackages) {
     Object.keys(pkg.dependencies).forEach(dep => dependenciesSet.add(dep));
     Object.keys(pkg.devDependencies).forEach(dep => dependenciesSet.add(dep));
   }
-  
+
   const purpose = detectPurpose(files, dependenciesSet);
   const readinessScore = analyzeReadiness(files, ignoredCount);
   const prompts = generateWorkflows(architecture, technologies);
@@ -187,7 +187,7 @@ function detectArchitecture(
         if (parsed.workspaces) {
           hasRootWorkspaces = true;
         }
-      } catch {}
+      } catch { }
     }
   }
   const hasSubpackageJson = parsedPackages.some(
@@ -262,7 +262,7 @@ function generateSummaryText(
   };
 
   let summary = `Scanned ${fileCount} files (${(totalSize / 1024 / 1024).toFixed(2)} MB). `;
-  
+
   if (purpose !== "unknown") {
     summary += `This project is classified as a ${purposeLabels[purpose]} configured on a ${archLabels[architecture]} layout. `;
   } else {

@@ -1,4 +1,4 @@
-import { ScannedFile } from "@codemelt/shared";
+import { ScannedFile } from "codemelt-shared";
 import { AIReadinessScore } from "./types.js";
 
 export function analyzeReadiness(
@@ -51,7 +51,7 @@ export function analyzeReadiness(
   // 3. Structure Clarity Scoring (Max 20)
   const standardizedDirs = ["src", "components", "lib", "app", "pages", "routes", "controllers", "services"];
   const matchedDirsCount = standardizedDirs.filter(dir => hasDirectory(dir)).length;
-  
+
   if (matchedDirsCount >= 2) {
     structureClarity += 15;
   } else if (matchedDirsCount === 1) {
@@ -88,9 +88,9 @@ export function analyzeReadiness(
 
   // 5. Context Optimization Scoring (Max 20)
   // Ensure huge lockfiles are not inside included scanned files list
-  const hasLockfilesInScan = files.some(f => 
-    f.name === "package-lock.json" || 
-    f.name === "yarn.lock" || 
+  const hasLockfilesInScan = files.some(f =>
+    f.name === "package-lock.json" ||
+    f.name === "yarn.lock" ||
     f.name === "pnpm-lock.yaml"
   );
   if (!hasLockfilesInScan) {
