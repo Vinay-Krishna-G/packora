@@ -1,97 +1,309 @@
 # CodeMelt
 
-Structured repository context exports for AI-assisted code understanding.
+![CodeMelt Cover](./assets/github/codemelt-cover.png)
 
-CodeMelt is a developer-focused utility that scans, filters, and prioritizes repository code and configurations, organizing them into a single, high-density context artifact. These generated context files are optimized for ingestion by Large Language Models (LLMs) during debugging, onboarding, architecture reviews, and general code analysis.
+> Transform repositories into structured development context.
 
-All processing occurs completely locally on your system to protect proprietary code privacy.
+CodeMelt is a local-first repository intelligence engine that converts large codebases into AI-optimized development context.
 
----
-
-## Workspace Architecture
-
-CodeMelt is structured as an npm workspaces monorepo:
-
-*   **[apps/web](apps/web)**: A premium Next.js frontend portal that allows users to drag-and-drop local directory files, visually manage inclusion/exclusion rules, analyze semantic repository architectures, and export context packages.
-*   **[packages/cli](packages/cli)**: The command-line interface for fast terminal-driven context generation and automation scripts.
-*   **[packages/core](packages/core)**: The core processing engine containing the file scanner, the heuristics repository analyzer, importance detectors, and context formatting models.
-*   **[packages/shared](packages/shared)**: Shared domain structures, safety boundary limits, and the default ignore rules list.
+Instead of manually uploading dozens of files into ChatGPT, Claude, Gemini, or Cursor, CodeMelt analyzes your repository, removes noise, extracts architectural signals, and generates structured context that AI systems can understand.
 
 ---
 
-## Core Features
+## The Problem
 
-*   **Intelligence Repository Analysis**: Automatically profiles your stack, identifies technologies, rates AI-readiness, and flags architectural patterns.
-*   **Granular Export Modes**:
-    *   `tiny`: Emits only critical/high-importance files for small prompt windows.
-    *   `standard`: Drops low-importance files and binaries.
-    *   `deep`: Incorporates all text source files.
-    *   `maximum`: Raw, comprehensive codebase export.
-*   **Intent Directives**: Customizes the context layout instructions targeting specific workflows (`debugging`, `onboarding`, `architecture`, `security`, `general`).
-*   **Semantic Navigation Maps**: Emits layout entrypoints, API endpoints mapping, and logical data flow paths to help LLMs build strong mental models of your system.
-*   **Local-First Privacy**: No telemetry, no API keys, and no network transfers.
+Modern AI assistants struggle with large repositories.
 
----
+Developers often:
 
-## Performance & Safety Disclosures
+- Copy files manually into chats
+- Upload folders repeatedly
+- Lose architectural context
+- Waste tokens on build artifacts
+- Spend time explaining project structure
 
-CodeMelt prioritizes system stability over raw scan speed. To protect resources, RAM, and CPU on large monorepos or enterprise projects:
-
-*   **Controlled Concurrency**: Concurrency is capped at a batch size of `20` simultaneous reads to prevent thermal spikes and browser/process crashes.
-*   **Granular Warning System**: Scans containing more than `500` files or exceeding `10MB` in total raw volume trigger professional, non-alarming warnings about resource consumption.
-*   **Early Pruning**: Leverages a highly tuned default ignore ruleset (skipping node_modules, .next, media assets, build structures, and lockfiles) to keep context sizes minimal.
-*   **Boundary Ceilings**: Implements maximum memory thresholds (e.g. 1MB per file text cap, 100KB character slicing, and total export limits) to ensure exports fit nicely in typical context windows.
+Large codebases become difficult for AI systems to understand efficiently.
 
 ---
 
-## Monorepo Setup & Installation
+## The Solution
 
-Ensure you have Node.js version 18 or higher installed on your environment.
+CodeMelt automatically:
 
-### Local Development
+- Scans repositories
+- Filters noise
+- Detects technologies
+- Identifies architecture
+- Extracts dependency relationships
+- Generates structured development context
 
-1. **Clone the repository and install workspaces**:
-   ```bash
-   git clone https://github.com/Vinay-Krishna-G/codemelt.git
-   cd codemelt
-   npm install
-   ```
-
-2. **Sequential Workspace Compilation**:
-   ```bash
-   npm run build
-   ```
-   *This sequentially compiles shared -> core -> cli -> web ensuring references are cleanly linked.*
-
-3. **Verify Typecheck and Tests**:
-   ```bash
-   npm run typecheck
-   ```
-
-4. **Launch Next.js Dev Server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) to view the web portal.
+The result is a compact, AI-ready representation of your codebase.
 
 ---
 
-## CLI Installation & Usage
+## Features
 
-To install and run CodeMelt globally in any directory:
+### Local-First Processing
 
-```bash
-# Install globally from npm registry
-npm install -g @codemelt/cli
+Your code never leaves your machine.
 
-# Verify installation
-codemelt --help
+Repositories are processed locally before export.
 
-# Initialize sensibly-tuned .codemeltignore file
-codemelt init
+---
 
-# Run scan and export context
-codemelt export
+### Smart Repository Filtering
+
+Automatically ignores:
+
+- node_modules
+- dist
+- build
+- coverage
+- cache directories
+- generated files
+
+Only meaningful source context is retained.
+
+---
+
+### Repository Intelligence
+
+Generate insights including:
+
+- Project topology
+- Framework detection
+- Dependency analysis
+- Technology stack discovery
+- Architecture overview
+- Monorepo detection
+
+---
+
+### AI-Optimized Context Export
+
+Exports structured context designed for:
+
+- ChatGPT
+- Claude
+- Gemini
+- Cursor
+- Windsurf
+- Copilot
+- Custom AI workflows
+
+---
+
+### Multi-Language Support
+
+Supports analysis of:
+
+- Node.js
+- Next.js
+- React
+- TypeScript
+- Python
+- Go
+- Rust
+- Java
+- Kotlin
+- PHP
+- Monorepos
+
+---
+
+### Fast Processing
+
+Large repositories can be analyzed in seconds.
+
+---
+
+## Screenshots
+
+### Landing Experience
+
+![Landing Page](./assets/github/landing-page.png)
+
+Modern local-first workflow designed specifically for AI-assisted development.
+
+---
+
+### Repository Upload Workspace
+
+![Upload Page](./assets/github/upload-page.png)
+
+Upload repositories directly from your browser and generate structured development context without additional setup.
+
+---
+
+### Repository Intelligence Report
+
+![Details Page](./assets/github/details-page.png)
+
+Deep repository analysis including architecture insights, technology detection, context quality scoring, and AI readiness metrics.
+
+---
+
+## How It Works
+
+```text
+Repository
+     │
+     ▼
+Repository Scanner
+     │
+     ▼
+Noise Filtering
+     │
+     ▼
+Technology Detection
+     │
+     ▼
+Architecture Analysis
+     │
+     ▼
+Context Compression
+     │
+     ▼
+AI-Optimized Export
 ```
 
-For comprehensive CLI documentation, refer to the [CLI README](packages/cli/README.md).
+---
+
+## Supported Ecosystems
+
+### Frontend
+
+- React
+- Next.js
+- TypeScript
+- JavaScript
+
+### Backend
+
+- Node.js
+- Express
+- FastAPI
+- Django
+- Flask
+
+### Systems
+
+- Go
+- Rust
+
+### Enterprise
+
+- Java
+- Kotlin
+- PHP
+
+### Monorepos
+
+- npm workspaces
+- Turborepo
+- multi-package repositories
+
+---
+
+## Example Use Cases
+
+### ChatGPT Context Export
+
+Convert a large repository into a compact context file before asking:
+
+```text
+Analyze this authentication flow.
+```
+
+---
+
+### AI Code Reviews
+
+Generate architectural summaries for:
+
+```text
+Review this codebase and identify risks.
+```
+
+---
+
+### Repository Onboarding
+
+Help new developers understand:
+
+- Project structure
+- Technologies
+- Key dependencies
+- Architecture patterns
+
+---
+
+### Documentation Generation
+
+Generate AI-ready context for:
+
+- README creation
+- Architecture diagrams
+- Technical documentation
+
+---
+
+## Installation
+
+### Global Install
+
+```bash
+npm install -g codemelt
+```
+
+### Run
+
+```bash
+npx codemelt export
+```
+
+---
+
+## Why CodeMelt?
+
+Most repository tools focus on:
+
+- search
+- indexing
+- code navigation
+
+CodeMelt focuses on something different:
+
+> Preparing repositories for AI.
+
+It bridges the gap between large codebases and modern AI workflows.
+
+---
+
+## Roadmap
+
+- Dependency graph visualization
+- Repository diagrams
+- Architecture maps
+- AI context quality improvements
+- Team workspaces
+- Context versioning
+- Incremental repository exports
+- VS Code extension
+
+---
+
+## Built For
+
+- Software Engineers
+- AI Engineers
+- Open Source Maintainers
+- Technical Writers
+- Engineering Teams
+- Developer Tool Builders
+
+---
+
+## License
+
+MIT
