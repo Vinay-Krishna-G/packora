@@ -6,7 +6,7 @@ import ora from "ora";
 import fs from "fs-extra";
 import path from "path";
 import { performance } from "node:perf_hooks";
-import { scanFiles, generateRepositoryContext, shouldIgnore } from "codemelt-core";
+import { scanFiles, generateRepositoryContext, shouldIgnore, buildDependencyGraph, explainNode } from "codemelt-core";
 import { DEFAULT_IGNORES, ExportMode, ExportIntent, MAX_DIRECTORY_DEPTH } from "codemelt-shared";
 
 const majorNodeVersion = parseInt(process.versions.node.split(".")[0], 10);
@@ -260,6 +260,104 @@ program
       spinner.stop();
       process.off("SIGINT", sigintHandler);
       console.error(chalk.red(`✖ Failed to export repository context: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+// --- COMMAND: explain ---
+program
+  .command("explain <target>")
+  .description("Explain a specific file and its role in the repository.")
+  .option("--json", "Output strictly formatted JSON")
+  .action(async (target: string, options: any) => {
+    const targetDir = process.cwd();
+
+    let spinner;
+    if (!options.json) {
+      spinner = ora("Scanning repository files...").start();
+    }
+
+    try {
+      let ignoreRules = [...DEFAULT_IGNORES];
+
+      const codemeltignorePath = path.join(targetDir, ".codemeltignore");
+      const reporazorignorePath = path.join(targetDir, ".reporazorignore");
+      const packoraignorePath = path.join(targetDir, ".packoraignore");
+
+      if (await fs.pathExists(codemeltignorePath)) {
+        const content = await fs.readFile(codemeltignorePath, "utf8");
+        ignoreRules = parseIgnoreFile(content);
+      } else if (await fs.pathExists(reporazorignorePath)) {
+        const content = await fs.readFile(reporazorignorePath, "utf8");
+        ignoreRules = parseIgnoreFile(content);
+      } else if (await fs.pathExists(packoraignorePath)) {
+        const content = await fs.readFile(packoraignorePath, "utf8");
+        ignoreRules = parseIgnoreFile(content);
+      }
+
+      const gitignorePath = path.join(targetDir, ".gitignore");
+      if (await fs.pathExists(gitignorePath)) {
+        const content = await fs.readFile(gitignorePath, "utf8");
+        const gitRules = parseIgnoreFile(content);
+        for (const rule of gitRules) {
+          if (!ignoreRules.includes(rule)) {
+            ignoreRules.push(rule);
+          }
+        }
+      }
+
+      const rawFiles = await getFilesRecursively(targetDir, targetDir, ignoreRules);
+      const scanResult = await scanFiles(rawFiles, ignoreRules, options.json);
+
+      if (spinner) spinner.text = "Building dependency graph...";
+
+      // Build graph and explain
+      const graph = buildDependencyGraph(scanResult.scannedFiles);
+      const explanation = explainNode(graph, target);
+
+      if (spinner) spinner.stop();
+
+      if (!explanation) {
+        if (options.json) {
+          console.log(JSON.stringify({ error: `File not found in graph: ${target}` }));
+        } else {
+          console.error(chalk.red(`✖ File not found in graph: ${target}`));
+        }
+        process.exit(1);
+      }
+
+      if (options.json) {
+        console.log(JSON.stringify(explanation, null, 2));
+      } else {
+        console.log(chalk.bold(`\nPurpose:`));
+        console.log(explanation.purpose);
+        
+        console.log(chalk.bold(`\nImports:`));
+        if (explanation.imports.length === 0) console.log("None");
+        else explanation.imports.forEach(i => console.log(i));
+
+        console.log(chalk.bold(`\nUsed By:`));
+        if (explanation.usedBy.length === 0) console.log("None");
+        else explanation.usedBy.forEach(i => console.log(i));
+
+        console.log(chalk.bold(`\nImportance:`));
+        console.log(explanation.importance);
+
+        console.log(chalk.bold(`\nComplexity:`));
+        console.log(explanation.complexity);
+
+        console.log(chalk.bold(`\nFlow:`));
+        console.log(explanation.flow.join("\n↓\n"));
+        console.log("");
+      }
+
+    } catch (error: any) {
+      if (spinner) spinner.stop();
+      if (options.json) {
+        console.log(JSON.stringify({ error: error.message }));
+      } else {
+        console.error(chalk.red(`✖ Failed to explain file: ${error.message}`));
+      }
       process.exit(1);
     }
   });

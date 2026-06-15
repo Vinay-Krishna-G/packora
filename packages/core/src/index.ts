@@ -10,3 +10,4 @@ export { scoreFile } from "./prioritizer/scoreFile.js";
 export { estimateWords } from "./tokenizer/estimateWords.js";
 export { estimateTokens } from "./tokenizer/estimateTokens.js";
 export { generateRepositoryContext } from "./formatter/generateRepositoryContext.js";
+export * from "./graph/index.js";

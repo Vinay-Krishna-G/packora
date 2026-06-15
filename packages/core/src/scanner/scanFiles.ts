@@ -19,7 +19,8 @@ function isBinary(filename: string): boolean {
 
 export async function scanFiles(
     files: RawFile[],
-    customRules?: string[]
+    customRules?: string[],
+    quiet?: boolean
 ): Promise<ScanResult> {
     const scannedFiles: ScannedFile[] = [];
     let ignoredCount = 0;
@@ -35,7 +36,7 @@ export async function scanFiles(
     // Capping maximum number of files to index to protect memory
     let eligibleFilesList = normalizedFiles;
     if (eligibleFilesList.length > MAX_EXPORT_FILES) {
-        console.warn(`[CodeMelt] Safety boundary cap hit: repository contains ${eligibleFilesList.length} files. Restricting active index depth to ${MAX_EXPORT_FILES} items.`);
+        if (!quiet) console.warn(`[CodeMelt] Safety boundary cap hit: repository contains ${eligibleFilesList.length} files. Restricting active index depth to ${MAX_EXPORT_FILES} items.`);
         eligibleFilesList = eligibleFilesList.slice(0, MAX_EXPORT_FILES);
     }
 
@@ -50,7 +51,7 @@ export async function scanFiles(
     });
 
     if (files.length > 500) {
-        console.warn("[CodeMelt] Large repository detected. Export may take longer and use significant system resources.");
+        if (!quiet) console.warn("[CodeMelt] Large repository detected. Export may take longer and use significant system resources.");
     }
 
     const BATCH_SIZE = 20;

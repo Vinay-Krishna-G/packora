@@ -58,11 +58,12 @@ export interface CompressionStats {
 export interface AIReadinessScore {
   score: number; // 0 to 100
   breakdown: {
-    documentation: number;      // 0-20 points
-    typingQuality: number;      // 0-20 points
-    structureClarity: number;   // 0-20 points
-    configCompleteness: number;  // 0-20 points
-    contextOptimization: number; // 0-20 points
+    architecture: number;      // 0-20 points
+    entrypoints: number;       // 0-15 points
+    routes: number;            // 0-15 points
+    criticalFiles: number;     // 0-20 points
+    compression: number;       // 0-15 points
+    techDetection: number;     // 0-15 points
   };
   recommendations: string[];
 }
@@ -88,6 +89,17 @@ export interface ProjectAnalysis {
     high: number;
     normal: number;
     low: number;
+  };
+  tokenEstimates: {
+    rawRepository: number;
+    exportedContext: number;
+  };
+  compatibility: {
+    claudeSonnet: number;
+    gpt5: number;
+    geminiPro: number;
+    cursor: number;
+    copilot: number;
   };
   semanticAnalysis?: SemanticRepositoryAnalysis;
 }

@@ -1,4 +1,5 @@
 export * from "./types.js";
+export * from "./ai-models.js";
 export {
     MAX_FILES,
     MAX_TOTAL_BYTES,

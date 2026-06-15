@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "codemelt-core";
+import { AI_MODELS } from "codemelt-shared";
 import AIWorkflows from "./AIWorkflows";
 
 type RepositoryInsightsProps = {
@@ -11,7 +12,7 @@ export default function RepositoryInsights({
     analysis,
     exportSizeBytes,
 }: RepositoryInsightsProps) {
-    const { technologies, architecture, purpose, readinessScore, prompts, compression, summary, fileCount, totalSize, semanticAnalysis } = analysis;
+    const { technologies, architecture, purpose, readinessScore, prompts, compression, summary, fileCount, totalSize, semanticAnalysis, tokenEstimates, compatibility } = analysis;
 
     const [showWorkflows, setShowWorkflows] = useState(false);
 
@@ -122,7 +123,7 @@ export default function RepositoryInsights({
 
                 {/* Key Metrics block */}
                 <div className="rounded-xl border border-border bg-card p-5 flex flex-col justify-between font-mono text-[12.5px] text-foreground/90 shadow-sm">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5 select-none">// Context compression</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5 select-none">// Context tokens & size</span>
                     <div className="flex justify-between items-center border-b border-border pb-2.5 mb-2.5">
                         <span className="text-muted-foreground">Original size:</span>
                         <span className="font-semibold text-foreground">{metrics.originalSizeStr}</span>
@@ -131,26 +132,112 @@ export default function RepositoryInsights({
                         <span className="text-muted-foreground">Context savings:</span>
                         <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-bold">{metrics.savingsPercentage.toFixed(1)}%</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Readiness:</span>
-                        <span className={`font-semibold ${getReadinessColor(readinessScore.score)} font-bold`}>
-                            {readinessScore.score}/100 ({readinessLabel})
-                        </span>
+                    <div className="flex justify-between items-center mb-2.5">
+                        <span className="text-muted-foreground">Raw Tokens:</span>
+                        <span className="font-semibold">{tokenEstimates?.rawRepository.toLocaleString() || "0"}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-border pt-2.5 mt-auto">
+                        <span className="text-muted-foreground">Export Tokens:</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{tokenEstimates?.exportedContext.toLocaleString() || "0"}</span>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Details Grid */}
+            {/* AI Compatibility Panel */}
             <div className="grid gap-5 md:grid-cols-2 mb-6">
-                {/* Technology list (Upscaled to 12.5px font-mono to reduce compression) */}
-                <div className="rounded-xl border border-border bg-card/30 p-5 shadow-sm">
+                <div className="rounded-xl border border-border bg-card/30 p-5 font-mono text-[12px] shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// Context Usage Estimates</span>
+                    <div className="space-y-3 flex-grow">
+                        {[
+                            { name: AI_MODELS.claudeSonnet.name, comp: compatibility?.claudeSonnet },
+                            { name: AI_MODELS.gpt5.name, comp: compatibility?.gpt5 },
+                            { name: AI_MODELS.geminiPro.name, comp: compatibility?.geminiPro },
+                            { name: AI_MODELS.cursor.name, comp: compatibility?.cursor },
+                            { name: AI_MODELS.copilot.name, comp: compatibility?.copilot },
+                        ].map((model) => {
+                            const usage = model.comp ?? 0;
+                            const isGood = usage < 50;
+                            const isWarn = usage >= 50 && usage < 80;
+                            
+                            let icon = "✅";
+                            let iconColor = "text-emerald-500";
+                            let textColor = "text-emerald-600 dark:text-emerald-400";
+
+                            if (isWarn) {
+                                icon = "⚠️";
+                                iconColor = "text-amber-500";
+                                textColor = "text-amber-600 dark:text-amber-400";
+                            } else if (usage >= 80) {
+                                icon = "❌";
+                                iconColor = "text-rose-500";
+                                textColor = "text-rose-600 dark:text-rose-400";
+                            }
+
+                            return (
+                                <div key={model.name} className="flex justify-between items-center border-b border-border/50 pb-2 last:border-0 last:pb-0">
+                                    <span className="text-foreground/90">{model.name}</span>
+                                    <span className="flex items-center gap-2">
+                                        <span className={iconColor}>
+                                            {icon}
+                                        </span>
+                                        <span className={`font-semibold ${textColor}`}>
+                                            {usage}%
+                                        </span>
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="rounded-xl border border-border bg-card/30 p-5 font-mono text-[12px] shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// AI Readiness Score</span>
+                    
+                    <div className="flex items-end gap-3 mb-4 border-b border-border pb-4">
+                        <span className={`text-4xl font-bold ${getReadinessColor(readinessScore.score)}`}>
+                            {readinessScore.score}
+                        </span>
+                        <span className="text-muted-foreground mb-1">/ 100</span>
+                    </div>
+
+                    <div className="space-y-2 text-foreground/90 flex-grow">
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Architecture</span>
+                            <span>{readinessScore.breakdown.architecture ?? 0} / 20</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Entrypoints</span>
+                            <span>{readinessScore.breakdown.entrypoints ?? 0} / 15</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Routes</span>
+                            <span>{readinessScore.breakdown.routes ?? 0} / 15</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Critical Files</span>
+                            <span>{readinessScore.breakdown.criticalFiles ?? 0} / 20</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Compression</span>
+                            <span>{readinessScore.breakdown.compression ?? 0} / 15</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Tech Detection</span>
+                            <span>{readinessScore.breakdown.techDetection ?? 0} / 15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                {/* Technology list */}
+                <div className="rounded-xl border border-border bg-card/30 p-5 shadow-sm md:col-span-2">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-mono block mb-3.5 select-none">// Technology stack ({technologies.length})</span>
                     {technologies.length === 0 ? (
                         <div className="py-8 text-center text-xs text-muted-foreground font-mono select-none">
                             No stack signatures detected.
                         </div>
                     ) : (
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
                             {technologies.map((tech: any) => (
                                 <div key={tech.name} className="rounded-lg border border-border bg-background p-3 text-[12.5px] font-mono leading-relaxed shadow-sm">
                                     <div className="flex items-center justify-between">
@@ -170,46 +257,6 @@ export default function RepositoryInsights({
                         </div>
                     )}
                 </div>
-
-                {/* Scorecard */}
-                <div className="rounded-xl border border-border bg-card/30 p-5 font-mono text-[12px] shadow-sm">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-3.5 select-none">// Context quality scorecard</span>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        {/* Score Breakdown list */}
-                        <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-foreground shadow-sm">
-                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Metrics scorecard:</span>
-                            <div className="flex justify-between text-[12px] text-foreground/90">
-                                <span className="text-muted-foreground">Docs:</span>
-                                <span>{readinessScore.breakdown.documentation} / 20</span>
-                            </div>
-                            <div className="flex justify-between text-[12px] text-foreground/90">
-                                <span className="text-muted-foreground">Types:</span>
-                                <span>{readinessScore.breakdown.typingQuality} / 20</span>
-                            </div>
-                            <div className="flex justify-between text-[12px] text-foreground/90">
-                                <span className="text-muted-foreground">Clarity:</span>
-                                <span>{readinessScore.breakdown.structureClarity} / 20</span>
-                            </div>
-                            <div className="flex justify-between text-[12px] text-foreground/90">
-                                <span className="text-muted-foreground">Configs:</span>
-                                <span>{readinessScore.breakdown.configCompleteness} / 20</span>
-                            </div>
-                        </div>
-
-                        {/* Recommendations checklist */}
-                        <div className="space-y-2 rounded-lg border border-border bg-background p-3 text-muted-foreground shadow-sm">
-                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide block border-b border-border pb-1 select-none">Grounded adjustments:</span>
-                            {readinessScore.recommendations.slice(0, 3).map((rec: string) => (
-                                <div key={rec} className="text-[11.5px] leading-normal flex items-start gap-1">
-                                    <span className="text-amber-500 select-none">•</span>
-                                    <span className="truncate">{rec}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* 4. Request Flow Pipelines */}
             {semanticAnalysis && semanticAnalysis.flows.length > 0 && (
                 <div className="rounded-xl border border-border bg-card/30 p-5 mb-6 font-mono text-[12px] shadow-sm">

@@ -1,4 +1,4 @@
-import { ScannedFile } from "codemelt-shared";
+import { ScannedFile, AI_MODELS } from "codemelt-shared";
 import { TECHNOLOGY_RULES } from "./rules.js";
 import { ProjectAnalysis, DetectionResult, ArchitectureType, RepositoryPurpose } from "./types.js";
 
@@ -7,6 +7,7 @@ import { analyzeReadiness } from "./readinessAnalyzer.js";
 import { generateWorkflows } from "./workflowGenerator.js";
 import { detectPurpose } from "./purposeDetector.js";
 import { analyzeSemanticRepository } from "../summarizer/index.js";
+import { estimateTokens } from "../tokenizer/estimateTokens.js";
 
 interface ParsedPackageJson {
   path: string; // File path (e.g. "packages/web/package.json")
@@ -135,9 +136,10 @@ export function analyzeRepository(
   }
 
   const purpose = detectPurpose(files, dependenciesSet);
-  const readinessScore = analyzeReadiness(files, ignoredCount);
   const prompts = generateWorkflows(architecture, technologies);
   const compression = calculateCompression(files, totalFilesCount, ignoredCount, ignoredBytes);
+  const semanticAnalysis = analyzeSemanticRepository(files);
+  const readinessScore = analyzeReadiness(files, ignoredCount, architecture, semanticAnalysis, compression, technologies);
 
   // Compute file count per importance level cleanly
   const importanceStats = {
@@ -147,8 +149,36 @@ export function analyzeRepository(
     low: files.filter(f => f.importance === "low").length,
   };
 
-  const semanticAnalysis = analyzeSemanticRepository(files);
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
+  
+  // Calculate Token Estimates
+  const totalChars = files.reduce((acc, f) => acc + (f.type === "text" ? f.content.length : 0), 0);
+  const exportedContextChars = files.filter(f => f.included && f.type === "text").reduce((acc, f) => acc + f.content.length, 0);
+  
+  // Use heuristic that 1 token is roughly 4 chars
+  const rawRepositoryTokens = Math.ceil(totalChars / 4) + Math.ceil(ignoredBytes / 4);
+  const exportedContextTokens = Math.ceil(exportedContextChars / 4);
+
+  const tokenEstimates = {
+    rawRepository: rawRepositoryTokens,
+    exportedContext: exportedContextTokens,
+  };
+
+  // Calculate Context Usage
+  const calculateUsage = (window: number) => {
+    if (exportedContextTokens === 0) return 0;
+    const ratio = (exportedContextTokens / window) * 100;
+    return Math.min(100, Math.round(ratio));
+  };
+
+  const compatibility = {
+    claudeSonnet: calculateUsage(AI_MODELS.claudeSonnet.contextWindow),
+    gpt5: calculateUsage(AI_MODELS.gpt5.contextWindow),
+    geminiPro: calculateUsage(AI_MODELS.geminiPro.contextWindow),
+    cursor: calculateUsage(AI_MODELS.cursor.contextWindow),
+    copilot: calculateUsage(AI_MODELS.copilot.contextWindow),
+  };
+
   const summary = generateSummaryText(technologies, architecture, purpose.name, files.length, totalSize);
 
   return {
@@ -162,6 +192,8 @@ export function analyzeRepository(
     fileCount: files.length,
     totalSize,
     importanceStats,
+    tokenEstimates,
+    compatibility,
     semanticAnalysis,
   };
 }

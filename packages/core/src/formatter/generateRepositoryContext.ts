@@ -1,6 +1,8 @@
 import { ScannedFile, ExportMode, ExportIntent } from "codemelt-shared";
 import { sortFiles } from "../prioritizer/sortFiles.js";
 import { analyzeRepository } from "../analyzer/repositoryAnalyzer.js";
+import { buildDependencyGraph } from "../graph/buildDependencyGraph.js";
+import { getDependencyHotspots } from "../graph/analyzeGraph.js";
 
 function getSemanticFileDescription(path: string, name: string): string {
     const lowerPath = path.toLowerCase();
@@ -208,11 +210,18 @@ export function* generateRepositoryContextChunks(
     }
 
     // --- MARKDOWN EXPORT MODE FORMATTING ---
-    yield `# CodeMelt Project Context\n\n`;
+    // 1. Export Metadata Header
+    yield `<!-- CODEMELT CONTEXT -->\n`;
+    yield `<!-- Generated: ${new Date().toISOString().split("T")[0]} -->\n`;
+    yield `<!-- Repository: ${files.length > 0 && files[0].path.includes("/") ? files[0].path.split("/")[0] : "local-repo"} -->\n`;
+    yield `<!-- Raw Tokens: ${analysis.tokenEstimates?.rawRepository || 0} -->\n`;
+    yield `<!-- Export Tokens: ${analysis.tokenEstimates?.exportedContext || 0} -->\n`;
+    yield `<!-- Compression: ${analysis.compression.savingsPercentage.toFixed(1)}% -->\n`;
+    yield `<!-- AI Readiness: ${analysis.readinessScore.score}/100 -->\n\n`;
 
-    // Semantic XML Boundary Block for LLM Parsing in Markdown Mode
+    // 2. PROJECT SUMMARY
+    yield `# PROJECT SUMMARY\n\n`;
     let mdHeader = `<repository_analysis>\n`;
-    mdHeader += `## Repository Architecture Profile\n`;
     mdHeader += `- **Architecture Profile**: ${archLabels[analysis.architecture]}\n`;
     mdHeader += `- **Repository Purpose**: ${purposeLabels[analysis.purpose.name]} (Confidence: ${analysis.purpose.confidenceTier || 'Low'} - ${(analysis.purpose.confidence * 100).toFixed(0)}%)\n`;
     mdHeader += `- **AI Readiness Score**: ${analysis.readinessScore.score} / 100\n`;
@@ -223,57 +232,91 @@ export function* generateRepositoryContextChunks(
     mdHeader += `- **Workflows Directive**: ${intentDirectives[intent]}\n\n`;
     yield mdHeader;
 
-    let mdTech = `## Detected Technology Stack\n`;
+    // 3. TECH STACK
+    let mdTech = `# TECH STACK\n\n`;
     if (analysis.technologies.length === 0) {
-        mdTech += `*No prominent framework or library signatures detected in dependencies or configurations.*\n`;
+        mdTech += `*No prominent framework or library signatures detected in dependencies or configurations.*\n\n`;
     } else {
         for (const tech of analysis.technologies) {
             const versionStr = tech.version ? ` (v${tech.version})` : "";
             mdTech += `- **${tech.name}**${versionStr} - [Category: ${tech.category}] - Confidence: ${tech.confidenceTier || 'Low'} (${(tech.confidence * 100).toFixed(0)}%)\n`;
         }
+        mdTech += `\n`;
     }
     yield mdTech;
 
-    // Compact list of suggested workflows
-    let mdWorkflows = `\n## Recommended Workflow Invocations\n`;
+    // 4. ARCHITECTURE, 5. ENTRYPOINTS, 6. ROUTES, 8. DATA FLOW (from semantic analysis)
+    let mdArch = `# ARCHITECTURE\n\n`;
     for (const prompt of analysis.prompts) {
         const wfKey = prompt.title.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
-        mdWorkflows += `<recommended_workflow type="${wfKey}" />\n`;
+        mdArch += `<recommended_workflow type="${wfKey}" />\n`;
     }
-    yield mdWorkflows;
+    mdArch += `\n`;
+    yield mdArch;
 
-    // Semantic analysis navigation mapping
     if (analysis.semanticAnalysis) {
         const sem = analysis.semanticAnalysis;
-        let mdNav = `\n## Navigation & Architecture Map\n`;
+        
+        let mdEntry = `# ENTRYPOINTS\n\n`;
         if (sem.entrypoints.length > 0) {
-            mdNav += `### System Entrypoints\n`;
             for (const ep of sem.entrypoints) {
-                mdNav += `- **${ep.path}** [${ep.entrypointType || 'entrypoint'}] - ${ep.summary}\n`;
+                mdEntry += `- **${ep.path}** [${ep.entrypointType || 'entrypoint'}] - ${ep.summary}\n`;
             }
-            mdNav += `\n`;
+            mdEntry += `\n`;
+        } else {
+            mdEntry += `*No system entrypoints explicitly identified.*\n\n`;
         }
+        yield mdEntry;
+
+        let mdRoutes = `# ROUTES\n\n`;
         if (sem.routes.length > 0) {
-            mdNav += `### API Routing\n`;
             for (const r of sem.routes) {
-                mdNav += `- **${r.method} ${r.path}** -> Handled by \`${r.handlerFile.split('/').pop()}\`\n`;
+                mdRoutes += `- **${r.method} ${r.path}** -> Handled by \`${r.handlerFile.split('/').pop()}\`\n`;
             }
-            mdNav += `\n`;
+            mdRoutes += `\n`;
+        } else {
+            mdRoutes += `*No explicit API routes detected.*\n\n`;
         }
+        yield mdRoutes;
+        
+        let mdDataFlow = `# DATA FLOW\n\n`;
         if (sem.flows.length > 0) {
-            mdNav += `### Semantic Data Flows\n`;
             for (const f of sem.flows) {
-                mdNav += `- **${f.name}**: ${f.steps.join(" ➔ ")}\n`;
+                mdDataFlow += `- **${f.name}**: ${f.steps.join(" ➔ ")}\n`;
             }
-            mdNav += `\n`;
+            mdDataFlow += `\n`;
+        } else {
+            mdDataFlow += `*No explicit data flows extracted.*\n\n`;
         }
-        yield mdNav;
+        yield mdDataFlow;
+    } else {
+        yield `# ENTRYPOINTS\n\n*No entrypoints extracted.*\n\n`;
+        yield `# ROUTES\n\n*No explicit API routes detected.*\n\n`;
+        yield `# DATA FLOW\n\n*No explicit data flows extracted.*\n\n`;
     }
 
     yield `</repository_analysis>\n\n`;
 
-    // Add Directory Structure Tree in Markdown with semantic descriptors
-    let mdDir = `## Directory Structure\n\n\`\`\`text\n`;
+    // 7. DEPENDENCY HOTSPOTS (Using real Dependency Graph)
+    let mdHotspots = `# DEPENDENCY HOTSPOTS\n\n`;
+    
+    // Build the graph and get real hotspots
+    const graph = buildDependencyGraph(prioritizedFiles);
+    const hotspots = getDependencyHotspots(graph, 5);
+
+    if (hotspots.length > 0) {
+        hotspots.forEach((node, index) => {
+            mdHotspots += `${index + 1}. **${node.name}**\n`;
+            mdHotspots += `   Imported by: ${node.importedBy.length} files\n\n`;
+        });
+    } else {
+        mdHotspots += `*No significant dependency hotspots identified.*\n\n`;
+    }
+
+    yield mdHotspots;
+
+    // TOP FILES (Directory Structure)
+    let mdDir = `# TOP FILES\n\n\`\`\`text\n`;
     const dirRegisteredMd = new Set<string>();
     for (const file of prioritizedFiles) {
         if (analysis.semanticAnalysis) {
@@ -300,7 +343,8 @@ export function* generateRepositoryContextChunks(
     mdDir += `\`\`\`\n\n`;
     yield mdDir;
 
-    yield `## Repository Files\n\n`;
+    // 9. FILE SUMMARIES
+    yield `# FILE SUMMARIES\n\n`;
     for (const file of prioritizedFiles) {
         const sem = analysis.semanticAnalysis?.fileSummaries[file.path];
         const summaryVal = sem?.summary || getSemanticFileDescription(file.path, file.name);
